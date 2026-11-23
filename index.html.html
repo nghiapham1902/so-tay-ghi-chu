@@ -662,7 +662,7 @@
 
             <!-- Giao diện trình soạn thảo chính -->
             <div id="active-editor-wrapper" class="flex-1 flex flex-col h-full min-w-0 relative z-10">
-                <!-- Thanh công cụ trên cùng: Mở danh sách + Chọn Nhãn + Trạng thái lưu + Ghim/Xóa -->
+                <!-- Thanh công cụ trên cùng: Mở danh sách + Chọn Nhãn + Ghim + Xóa + Chuyển Sáng/Tối -->
                 <header class="px-4 py-2.5 border-b border-gray-200/70 dark:border-zinc-800/80 bg-white/75 dark:bg-zinc-950/75 backdrop-blur-xl flex flex-wrap items-center justify-between gap-2 z-20">
                     <div class="flex items-center gap-2 min-w-0 flex-wrap">
                         <!-- Nút mở lại danh sách ghi chú (hiện khi cột danh sách đang thu gọn) -->
@@ -682,18 +682,22 @@
                         </div>
                     </div>
 
-                    <!-- Các hành động phải: Trạng thái lưu + Ghim + Khôi phục/Xóa -->
+                    <!-- Các hành động phải: Ghim + Khôi phục + Xóa + Chuyển Sáng/Tối -->
                     <div class="flex items-center gap-1.5">
-                    <!-- Các hành động phải: Trạng thái lưu + Khôi phục + Chuyển Sáng/Tối -->
-                    <div class="flex items-center gap-2">
-                    <!-- Các hành động phải: Khôi phục + Chuyển Sáng/Tối -->
-                    <div class="flex items-center gap-2">
+                        <button id="pin-note-btn" onclick="togglePinCurrentNote()" title="Ghim / Bỏ ghim ghi chú" class="p-1.5 rounded-xl text-gray-500 dark:text-zinc-400 hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer">
+                            <i data-lucide="pin" class="w-4 h-4"></i>
+                        </button>
+
                         <button id="restore-note-btn" onclick="restoreCurrentNote()" title="Khôi phục ghi chú" class="hidden items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-xs font-semibold hover:bg-emerald-100 transition-all cursor-pointer">
                             <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
                             <span>Khôi phục</span>
                         </button>
 
-                        <button id="theme-toggle-btn" onclick="toggleTheme()" role="switch" aria-label="Chuyển chế độ Sáng / Tối" title="Chuyển chế độ Sáng / Tối" class="theme-pill-switch cursor-pointer">
+                        <button id="delete-note-btn" onclick="deleteCurrentNote()" title="Chuyển vào thùng rác / Xóa vĩnh viễn" class="p-1.5 rounded-xl text-gray-500 dark:text-zinc-400 hover:text-rose-500 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+
+                        <button id="theme-toggle-btn" onclick="toggleTheme()" role="switch" aria-label="Chuyển chế độ Sáng / Tối" title="Chuyển chế độ Sáng / Tối" class="theme-pill-switch cursor-pointer ml-1">
                             <span class="theme-pill-label theme-pill-label-day">DAY<br>MODE</span>
                             <span class="theme-pill-label theme-pill-label-night">NIGHT<br>MODE</span>
                             <span class="theme-pill-knob">
@@ -919,7 +923,7 @@
                 <i data-lucide="alert-triangle" class="w-6 h-6"></i>
             </div>
             <h3 class="text-base font-bold text-gray-900 dark:text-white mb-1">Xóa vĩnh viễn ghi chú?</h3>
-            <p class="text-xs text-gray-500 dark:text-zinc-400 mb-5">Hành động này không thể hoàn tác. Ghi chú sẽ bị xóa khỏi bộ nhớ trình duyệt.</p>
+            <p class="text-xs text-gray-500 dark:text-zinc-400 mb-5">Hành động này không thể hoàn tác. Ghi chú sẽ bị xóa khỏi đám mây và bộ nhớ trình duyệt.</p>
             <div class="flex items-center justify-center gap-2.5">
                 <button onclick="closeConfirmModal()" class="flex-1 px-4 py-2 rounded-xl text-xs font-semibold bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors cursor-pointer">Hủy bỏ</button>
                 <button id="confirm-delete-btn" class="flex-1 px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white transition-colors cursor-pointer">Xóa vĩnh viễn</button>
@@ -957,7 +961,7 @@
                 <div class="space-y-1.5">
                     <label class="block font-semibold text-gray-700 dark:text-zinc-200">Mã đồng bộ không gian (Workspace ID)</label>
                     <div class="flex gap-1.5">
-                        <input id="cloud-workspace-input" type="text" placeholder="Ví dụ: sotay-cua-toi-2026" class="flex-1 px-3 py-2 rounded-xl bg-gray-100/80 dark:bg-zinc-800 border border-gray-200/80 dark:border-zinc-700 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/40">
+                        <input id="cloud-workspace-input" type="text" onkeydown="if(event.key==='Enter'){event.preventDefault();applyWorkspaceId();}" placeholder="Ví dụ: nghia1902" class="flex-1 px-3 py-2 rounded-xl bg-gray-100/80 dark:bg-zinc-800 border border-gray-200/80 dark:border-zinc-700 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/40">
                         <button onclick="copyWorkspaceId()" title="Sao chép mã" class="px-2.5 py-2 rounded-xl bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-200 font-medium cursor-pointer">
                             <i data-lucide="copy" class="w-3.5 h-3.5"></i>
                         </button>
@@ -984,7 +988,7 @@
 
     <!-- ==================== MÃ JAVASCRIPT LOGIC ỨNG DỤNG & ĐỒNG BỘ ĐÁM MÂY ==================== -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import {
             getFirestore,
@@ -999,6 +1003,8 @@
         const THEME_KEY = 'sotay_theme_v1';
         const FONT_DEFAULT_KEY = 'sotay_default_font_v1';
         const LIST_COLLAPSED_KEY = 'sotay_list_collapsed_v1';
+        const WORKSPACE_STORAGE_KEY = 'sotay_workspace_id_v1';
+        const CUSTOM_CONFIG_STORAGE_KEY = 'sotay_custom_firebase_config_v1';
 
         const FONT_CONFIG = {
             inter: { label: 'Inter', desc: 'Hiện đại, sắc nét', css: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" },
@@ -1096,7 +1102,7 @@
         let auth = null;
         let currentUser = null;
         let appId = typeof __app_id !== 'undefined' ? __app_id : 'sotay-cloud-app';
-        let workspaceId = 'default-workspace';
+        let workspaceId = localStorage.getItem(WORKSPACE_STORAGE_KEY) || '';
         let unsubscribeNotes = null;
         let unsubscribeLabels = null;
         let isCloudReady = false;
@@ -1141,6 +1147,12 @@
                     measurementId: "G-E70RC3LFJG"
                 };
 
+                let storedCustomConfig = null;
+                try {
+                    const rawCfg = localStorage.getItem(CUSTOM_CONFIG_STORAGE_KEY);
+                    if (rawCfg) storedCustomConfig = JSON.parse(rawCfg);
+                } catch (_) {}
+
                 let firebaseConfig = null;
                 if (typeof __firebase_config !== 'undefined' && __firebase_config) {
                     firebaseConfig = typeof __firebase_config === 'string'
@@ -1148,6 +1160,8 @@
                         : __firebase_config;
                 } else if (window.__CUSTOM_CLOUD_CONFIG__) {
                     firebaseConfig = window.__CUSTOM_CLOUD_CONFIG__;
+                } else if (storedCustomConfig) {
+                    firebaseConfig = storedCustomConfig;
                 } else {
                     firebaseConfig = BUILTIN_FIREBASE_CONFIG;
                 }
@@ -1160,22 +1174,28 @@
                     return;
                 }
 
-                const app = initializeApp(firebaseConfig);
+                const existingApps = getApps();
+                const app = existingApps.length > 0 ? existingApps[0] : initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
 
-                // RULE 3: Luôn xác thực trước khi truy vấn Firestore
+                // Luôn xác thực trước khi truy vấn Firestore
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
+                } else if (!auth.currentUser) {
                     await signInAnonymously(auth);
                 }
 
                 currentUser = auth.currentUser;
-                workspaceId = currentUser?.uid || 'shared-workspace';
+                const savedWs = localStorage.getItem(WORKSPACE_STORAGE_KEY);
+                if (savedWs && savedWs.trim()) {
+                    workspaceId = savedWs.trim();
+                } else {
+                    workspaceId = currentUser?.uid || 'shared-workspace';
+                    localStorage.setItem(WORKSPACE_STORAGE_KEY, workspaceId);
+                }
                 isCloudReady = true;
 
-                updateCloudStatus('connected', 'Đã đồng bộ');
                 startRealtimeListeners();
             } catch (err) {
                 console.error('Lỗi kết nối đám mây:', err);
@@ -1188,72 +1208,108 @@
         function startRealtimeListeners() {
             if (!db || !currentUser) return;
 
-            if (unsubscribeNotes) unsubscribeNotes();
-            if (unsubscribeLabels) unsubscribeLabels();
+            if (unsubscribeNotes) {
+                unsubscribeNotes();
+                unsubscribeNotes = null;
+            }
+            if (unsubscribeLabels) {
+                unsubscribeLabels();
+                unsubscribeLabels = null;
+            }
 
-            // RULE 1: Đường dẫn chuẩn /artifacts/{appId}/public/data/{collectionName}
-            // Dùng không gian công khai theo workspaceId để mở được trên mọi trình duyệt
             const safeWs = workspaceId.replace(/[^a-zA-Z0-9_-]/g, '_');
             const notesColRef = collection(db, 'artifacts', appId, 'public', 'data', `notes_${safeWs}`);
             const labelsColRef = collection(db, 'artifacts', appId, 'public', 'data', `labels_${safeWs}`);
 
             let initialNotesLoaded = false;
             let initialLabelsLoaded = false;
+            let notesReady = false;
+            let labelsReady = false;
+
+            const markConnectedIfReady = () => {
+                if (notesReady && labelsReady) {
+                    updateCloudStatus('connected', 'Đã đồng bộ');
+                }
+            };
 
             unsubscribeLabels = onSnapshot(labelsColRef, async (snapshot) => {
-                if (snapshot.empty && !initialLabelsLoaded) {
-                    initialLabelsLoaded = true;
-                    for (const lbl of DEFAULT_LABELS) {
-                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', `labels_${safeWs}`, lbl.id), lbl);
+                try {
+                    if (snapshot.empty && !initialLabelsLoaded) {
+                        initialLabelsLoaded = true;
+                        for (let i = 0; i < DEFAULT_LABELS.length; i++) {
+                            const lbl = DEFAULT_LABELS[i];
+                            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', `labels_${safeWs}`, lbl.id), {
+                                ...lbl,
+                                order: i
+                            });
+                        }
+                        labelsReady = true;
+                        markConnectedIfReady();
+                        return;
                     }
-                    return;
+                    initialLabelsLoaded = true;
+                    const fetchedLabels = [];
+                    snapshot.forEach(d => fetchedLabels.push({ id: d.id, ...d.data() }));
+                    if (fetchedLabels.length > 0) {
+                        labels = fetchedLabels.sort((a, b) => (a.order || 0) - (b.order || 0));
+                    }
+                    labelsReady = true;
+                    markConnectedIfReady();
+                    renderAll();
+                } catch (err) {
+                    console.error('Lỗi xử lý nhãn:', err);
+                    updateCloudStatus('error', 'Lỗi đồng bộ');
                 }
-                initialLabelsLoaded = true;
-                const fetchedLabels = [];
-                snapshot.forEach(d => fetchedLabels.push({ id: d.id, ...d.data() }));
-                if (fetchedLabels.length > 0) {
-                    labels = fetchedLabels.sort((a, b) => (a.order || 0) - (b.order || 0));
-                }
-                renderAll();
             }, (error) => {
                 console.error('Lỗi đồng bộ nhãn:', error);
+                updateCloudStatus('error', 'Lỗi kết nối');
             });
 
             unsubscribeNotes = onSnapshot(notesColRef, async (snapshot) => {
-                if (snapshot.empty && !initialNotesLoaded) {
+                try {
+                    if (snapshot.empty && !initialNotesLoaded) {
+                        initialNotesLoaded = true;
+                        await seedDefaultNotesToCloud(safeWs);
+                        notesReady = true;
+                        markConnectedIfReady();
+                        return;
+                    }
                     initialNotesLoaded = true;
-                    await seedDefaultNotesToCloud(safeWs);
-                    return;
-                }
-                initialNotesLoaded = true;
 
-                const fetchedNotes = [];
-                snapshot.forEach(d => fetchedNotes.push({ id: d.id, ...d.data() }));
-                notes = fetchedNotes;
+                    const fetchedNotes = [];
+                    snapshot.forEach(d => fetchedNotes.push({ id: d.id, ...d.data() }));
+                    notes = fetchedNotes;
 
-                if (!activeNoteId || !notes.some(n => n.id === activeNoteId)) {
-                    const firstAvailable = getFilteredNotes()[0];
-                    if (firstAvailable) {
-                        activeNoteId = firstAvailable.id;
-                        renderAll();
-                        selectNote(activeNoteId, false);
+                    notesReady = true;
+                    markConnectedIfReady();
+
+                    if (!activeNoteId || !notes.some(n => n.id === activeNoteId)) {
+                        const firstAvailable = getFilteredNotes()[0];
+                        if (firstAvailable) {
+                            activeNoteId = firstAvailable.id;
+                            renderAll();
+                            selectNote(activeNoteId, false);
+                        } else {
+                            renderAll();
+                            showEmptyEditorState();
+                        }
                     } else {
                         renderAll();
-                        showEmptyEditorState();
-                    }
-                } else {
-                    renderAll();
-                    // Cập nhật nội dung nếu thay đổi từ thiết bị khác (không ghi đè khi đang gõ)
-                    const activeEl = document.activeElement;
-                    const isTyping = activeEl && (activeEl.id === 'note-title-input' || activeEl.id === 'editor-content');
-                    if (!isTyping) {
-                        const current = notes.find(n => n.id === activeNoteId);
-                        if (current) {
-                            document.getElementById('note-title-input').value = current.title || '';
-                            document.getElementById('editor-content').innerHTML = current.content || '';
-                            updateEditorMetadata(current);
+                        // Cập nhật nội dung nếu thay đổi từ thiết bị khác (không ghi đè khi đang gõ)
+                        const activeEl = document.activeElement;
+                        const isTyping = activeEl && (activeEl.id === 'note-title-input' || activeEl.id === 'editor-content');
+                        if (!isTyping) {
+                            const current = notes.find(n => n.id === activeNoteId);
+                            if (current) {
+                                document.getElementById('note-title-input').value = current.title || '';
+                                document.getElementById('editor-content').innerHTML = current.content || '';
+                                updateEditorMetadata(current);
+                            }
                         }
                     }
+                } catch (err) {
+                    console.error('Lỗi xử lý ghi chú:', err);
+                    updateCloudStatus('error', 'Lỗi đồng bộ');
                 }
             }, (error) => {
                 console.error('Lỗi đồng bộ ghi chú:', error);
@@ -1322,6 +1378,9 @@
             } else if (state === 'syncing') {
                 badge.className = 'inline-flex items-center gap-1.5 text-[11px] text-indigo-600 dark:text-indigo-400 font-medium px-2 py-0.5 rounded-lg bg-indigo-500/10 transition-colors cursor-pointer';
                 dot.className = 'w-1.5 h-1.5 rounded-full bg-indigo-500 animate-ping';
+            } else if (state === 'error') {
+                badge.className = 'inline-flex items-center gap-1.5 text-[11px] text-rose-600 dark:text-rose-400 font-medium px-2 py-0.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/15 transition-colors cursor-pointer';
+                dot.className = 'w-1.5 h-1.5 rounded-full bg-rose-500';
             } else {
                 badge.className = 'inline-flex items-center gap-1.5 text-[11px] text-amber-600 dark:text-amber-400 font-medium px-2 py-0.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/15 transition-colors cursor-pointer';
                 dot.className = 'w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse';
@@ -1377,6 +1436,8 @@
         function openCloudSettingsModal() {
             const modal = document.getElementById('cloud-settings-modal');
             const wsInput = document.getElementById('cloud-workspace-input');
+            const fb = document.getElementById('cloud-config-feedback');
+            if (fb) fb.classList.add('hidden');
             if (wsInput) wsInput.value = workspaceId;
             if (modal) modal.classList.add('modal-open');
             if (window.lucide) lucide.createIcons();
@@ -1399,13 +1460,18 @@
             }
         }
 
-        function applyWorkspaceId() {
+        async function applyWorkspaceId() {
             const wsInput = document.getElementById('cloud-workspace-input');
             const val = wsInput?.value.trim();
             if (!val) return;
             workspaceId = val;
+            localStorage.setItem(WORKSPACE_STORAGE_KEY, workspaceId);
             activeNoteId = null;
-            if (isCloudReady) {
+
+            if (!isCloudReady) {
+                updateCloudStatus('syncing', 'Đang kết nối...');
+                await initCloudSync();
+            } else {
                 updateCloudStatus('syncing', 'Đang chuyển không gian...');
                 startRealtimeListeners();
             }
@@ -1423,6 +1489,7 @@
                     throw new Error('Thiếu apiKey hoặc projectId');
                 }
                 window.__CUSTOM_CLOUD_CONFIG__ = parsed;
+                localStorage.setItem(CUSTOM_CONFIG_STORAGE_KEY, JSON.stringify(parsed));
                 fb.textContent = 'Cấu hình hợp lệ! Đang kết nối máy chủ đám mây...';
                 fb.className = 'text-[11px] font-medium text-emerald-600 dark:text-emerald-400';
                 fb.classList.remove('hidden');
@@ -1438,7 +1505,10 @@
         let themeTransitionTimer = null;
 
         function loadTheme() {
-            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const saved = localStorage.getItem(THEME_KEY);
+            const prefersDark = saved
+                ? saved === 'dark'
+                : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
             document.documentElement.classList.toggle('dark', prefersDark);
             updateThemeIcon(prefersDark, false);
         }
@@ -1454,6 +1524,7 @@
             }, 460);
 
             root.classList.toggle('dark', isDark);
+            localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
             updateThemeIcon(isDark, true);
             renderBgControls();
 
@@ -1500,16 +1571,17 @@
         }
 
         function loadDefaultFont() {
-            defaultFont = 'inter';
+            defaultFont = localStorage.getItem(FONT_DEFAULT_KEY) || 'inter';
         }
 
         function loadListCollapseState() {
-            isNoteListCollapsed = false;
+            isNoteListCollapsed = localStorage.getItem(LIST_COLLAPSED_KEY) === 'true';
             applyListCollapseUI();
         }
 
         function toggleNoteListCollapse(forceState) {
             isNoteListCollapsed = typeof forceState === 'boolean' ? forceState : !isNoteListCollapsed;
+            localStorage.setItem(LIST_COLLAPSED_KEY, String(isNoteListCollapsed));
             applyListCollapseUI();
         }
 
@@ -1785,6 +1857,14 @@
             document.getElementById('note-title-input').disabled = isTrashed;
             document.getElementById('editor-content').contentEditable = isTrashed ? 'false' : 'true';
             document.getElementById('formatting-toolbar').classList.toggle('hidden', isTrashed);
+
+            const pinBtn = document.getElementById('pin-note-btn');
+            if (pinBtn) {
+                pinBtn.classList.toggle('hidden', isTrashed);
+                pinBtn.classList.toggle('text-amber-500', Boolean(note.pinned));
+                pinBtn.classList.toggle('text-gray-500', !note.pinned);
+                pinBtn.classList.toggle('dark:text-zinc-400', !note.pinned);
+            }
 
             const restoreBtn = document.getElementById('restore-note-btn');
             restoreBtn.classList.toggle('hidden', !isTrashed);
@@ -2144,6 +2224,7 @@
         function selectNoteFont(fontKey) {
             if (!FONT_CONFIG[fontKey]) return;
             defaultFont = fontKey;
+            localStorage.setItem(FONT_DEFAULT_KEY, fontKey);
 
             const note = notes.find(n => n.id === activeNoteId);
             if (note && !note.trashed) {
