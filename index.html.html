@@ -1,933 +1,2640 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" class="light">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sổ Tay — Ghi chú cá nhân</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --bg-app: #0f1115;
-      --bg-sidebar: #14171d;
-      --bg-list: #181c23;
-      --bg-editor: #12151b;
-      --bg-surface: #1e232c;
-      --bg-hover: #252b36;
-      --border: #272d38;
-      --text-main: #eef1f6;
-      --text-muted: #8c96a6;
-      --accent: #6c63ff;
-      --accent-hover: #5b52f0;
-      --success: #22c55e;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sổ Tay — Ghi Chú Cá Nhân</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts tiếng Việt chuẩn đẹp -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,600;1,400&family=Lora:ital,wght@0,400;0,600;1,400&family=Mali:ital,wght@0,400;0,600;1,400&family=Nunito:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', 'Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'macos-window': '0 24px 68px -12px rgba(0, 0, 0, 0.22), 0 0 0 1px rgba(0, 0, 0, 0.08)',
+                        'macos-window-dark': '0 28px 80px -12px rgba(0, 0, 0, 0.68), 0 0 0 1px rgba(255, 255, 255, 0.1)',
+                        'macos-popover': '0 18px 42px -10px rgba(0, 0, 0, 0.18), 0 4px 14px -2px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.06)',
+                        'macos-popover-dark': '0 22px 50px -10px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.1)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* ==================== CẤU HÌNH CHUNG & PHÔNG CHỮ ==================== */
+        :root {
+            --apple-spring: cubic-bezier(0.19, 1, 0.22, 1);
+            --apple-ease: cubic-bezier(0.25, 1, 0.5, 1);
+            --editor-font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
 
-    body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      background: var(--bg-app);
-      color: var(--text-main);
-      height: 100vh;
-      display: flex;
-      overflow: hidden;
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+            overflow: hidden;
+            user-select: none;
+        }
 
-    /* Sidebar */
-    .sidebar {
-      width: 240px;
-      background: var(--bg-sidebar);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      flex-shrink: 0;
-    }
+        /* ==================== KHUNG CỬA SỔ MACOS & GLASS VIBRANCY ==================== */
+        .macos-wallpaper {
+            background: radial-gradient(circle at 15% 15%, #e0e7ff 0%, #f1f5f9 45%, #e2e8f0 100%);
+        }
+        html.dark .macos-wallpaper {
+            background: radial-gradient(circle at 20% 10%, #1e1b4b 0%, #09090b 55%, #000000 100%);
+        }
 
-    .brand {
-      padding: 18px 16px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+        .macos-window-frame {
+            box-shadow: 0 24px 68px -12px rgba(0, 0, 0, 0.18), inset 0 1px 0 0 rgba(255, 255, 255, 0.85);
+        }
+        html.dark .macos-window-frame {
+            box-shadow: 0 30px 80px -12px rgba(0, 0, 0, 0.75), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+        }
 
-    .brand-icon {
-      width: 34px;
-      height: 34px;
-      border-radius: 9px;
-      background: var(--accent);
-      display: grid;
-      place-items: center;
-      color: #fff;
-    }
+        .macos-sidebar-vibrancy {
+            background: rgba(246, 246, 248, 0.78);
+            backdrop-filter: blur(28px) saturate(180%);
+            -webkit-backdrop-filter: blur(28px) saturate(180%);
+        }
+        html.dark .macos-sidebar-vibrancy {
+            background: rgba(24, 24, 27, 0.78);
+            backdrop-filter: blur(28px) saturate(180%);
+            -webkit-backdrop-filter: blur(28px) saturate(180%);
+        }
 
-    .brand-title { font-size: 15px; font-weight: 700; }
-    .brand-sub { font-size: 11px; color: var(--text-muted); }
+        /* Logo App Squircle */
+        .app-logo-badge {
+            box-shadow: 0 4px 12px -2px rgba(79, 70, 229, 0.35), inset 0 1px 0 0 rgba(255, 255, 255, 0.35);
+            transition: transform 260ms var(--apple-spring), box-shadow 260ms ease;
+        }
+        .app-logo-badge:hover {
+            transform: scale(1.06) rotate(-2deg);
+            box-shadow: 0 6px 16px -2px rgba(79, 70, 229, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.45);
+        }
 
-    .nav-scroll {
-      padding: 12px 10px;
-      overflow-y: auto;
-      flex: 1;
-    }
+        /* ==================== CHUYỂN ĐỔI GIAO DIỆN SÁNG / TỐI SIÊU MƯỢT ==================== */
+        html.theme-transitioning,
+        html.theme-transitioning *,
+        html.theme-transitioning *::before,
+        html.theme-transitioning *::after {
+            transition:
+                background-color 420ms var(--apple-ease),
+                color 320ms var(--apple-ease),
+                border-color 380ms var(--apple-ease),
+                box-shadow 420ms var(--apple-ease),
+                backdrop-filter 420ms var(--apple-ease) !important;
+        }
 
-    .section-label {
-      font-size: 10.5px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      color: var(--text-muted);
-      padding: 10px 8px 6px;
-      text-transform: uppercase;
-    }
+        @keyframes themeIconSpin {
+            0% {
+                transform: rotate(-80deg) scale(0.5);
+                opacity: 0;
+            }
+            65% {
+                transform: rotate(12deg) scale(1.12);
+                opacity: 1;
+            }
+            100% {
+                transform: rotate(0deg) scale(1);
+                opacity: 1;
+            }
+        }
+        .theme-icon-animate {
+            animation: themeIconSpin 420ms var(--apple-spring) forwards;
+        }
 
-    .nav-item {
-      width: 100%;
-      border: none;
-      background: transparent;
-      color: var(--text-main);
-      padding: 8px 10px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 13px;
-      cursor: pointer;
-      margin-bottom: 2px;
-      text-align: left;
-    }
+        /* ==================== CÔNG TẮC PILL NIGHT / DAY MODE ==================== */
+        .theme-pill-switch {
+            position: relative;
+            width: 88px;
+            height: 30px;
+            border-radius: 9999px;
+            padding: 3px;
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 55%, #2563eb 100%);
+            box-shadow:
+                inset 0 1.5px 4px rgba(12, 74, 110, 0.25),
+                0 2px 8px -2px rgba(14, 165, 233, 0.35);
+            transition: background 420ms var(--apple-spring), box-shadow 420ms var(--apple-spring), transform 180ms ease;
+            overflow: hidden;
+        }
+        html.dark .theme-pill-switch {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 52%, #4338ca 100%);
+            box-shadow:
+                inset 0 1.5px 5px rgba(9, 7, 29, 0.6),
+                0 2px 10px -2px rgba(67, 56, 202, 0.45);
+        }
+        .theme-pill-switch:hover {
+            transform: scale(1.03);
+        }
+        .theme-pill-switch:active {
+            transform: scale(0.96);
+        }
 
-    .nav-item:hover { background: var(--bg-hover); }
-    .nav-item.active { background: rgba(108, 99, 255, 0.18); color: #fff; font-weight: 600; }
+        .theme-pill-knob {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            border-radius: 9999px;
+            background: #ffffff;
+            box-shadow:
+                0 1.5px 4px rgba(0, 0, 0, 0.22),
+                inset 0 0 0 1.5px rgba(243, 244, 246, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: translateX(58px);
+            transition: transform 440ms var(--apple-spring);
+            z-index: 2;
+        }
+        html.dark .theme-pill-knob {
+            transform: translateX(0px);
+        }
 
-    .nav-left { display: flex; align-items: center; gap: 9px; min-width: 0; }
-    .nav-left span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .badge { font-size: 11px; color: var(--text-muted); }
+        .theme-pill-label {
+            font-size: 8px;
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: #ffffff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.16);
+            transition: opacity 260ms ease, transform 360ms var(--apple-spring);
+            pointer-events: none;
+            user-select: none;
+        }
+        .theme-pill-label-day {
+            margin-left: 9px;
+            text-align: left;
+            opacity: 1;
+            transform: translateX(0);
+        }
+        html.dark .theme-pill-label-day {
+            opacity: 0;
+            transform: translateX(-6px);
+        }
+        .theme-pill-label-night {
+            position: absolute;
+            right: 9px;
+            text-align: left;
+            opacity: 0;
+            transform: translateX(6px);
+        }
+        html.dark .theme-pill-label-night {
+            opacity: 1;
+            transform: translateX(0);
+        }
 
-    /* Cloud footer */
-    .cloud-box {
-      padding: 10px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+        /* ==================== THANH CUỘN SIÊU MẢNH KIỂU MACOS ==================== */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.35);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(107, 114, 128, 0.55);
+        }
+        html.dark ::-webkit-scrollbar-thumb {
+            background: rgba(113, 113, 122, 0.35);
+        }
+        html.dark ::-webkit-scrollbar-thumb:hover {
+            background: rgba(161, 161, 170, 0.55);
+        }
 
-    .cloud-trigger {
-      flex: 1;
-      border: 1px solid var(--border);
-      background: var(--bg-surface);
-      color: var(--text-main);
-      border-radius: 9px;
-      padding: 8px 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      cursor: pointer;
-      font-size: 12px;
-    }
+        /* ==================== CHUYỂN ĐỘNG CỘT DANH SÁCH GHI CHÚ ==================== */
+        #note-list-panel {
+            transition:
+                width 360ms var(--apple-spring),
+                min-width 360ms var(--apple-spring),
+                opacity 240ms ease,
+                transform 360ms var(--apple-spring);
+            will-change: width, opacity, transform;
+        }
 
-    .cloud-trigger:hover { background: var(--bg-hover); }
+        #note-list-panel.list-collapsed {
+            width: 0px !important;
+            min-width: 0px !important;
+            opacity: 0 !important;
+            border-right-width: 0px !important;
+            overflow: hidden !important;
+            pointer-events: none !important;
+        }
 
-    .status-pill {
-      font-size: 11px;
-      padding: 3px 7px;
-      border-radius: 999px;
-      font-weight: 600;
-      white-space: nowrap;
-      background: rgba(140, 150, 166, 0.16);
-      color: var(--text-muted);
-    }
+        /* ==================== ANIMATION MỞ THƯ MỤC & THẺ GHI CHÚ ==================== */
+        @keyframes folderPop {
+            0% { transform: scale(0.95); }
+            55% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+        .folder-pop {
+            animation: folderPop 340ms var(--apple-spring) forwards;
+        }
 
-    .status-pill.connected {
-      background: rgba(34, 197, 94, 0.16);
-      color: var(--success);
-    }
+        @keyframes titleSlideIn {
+            0% { opacity: 0; transform: translateX(-8px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+        .title-slide-in {
+            animation: titleSlideIn 300ms var(--apple-spring) forwards;
+        }
 
-    .status-pill.syncing {
-      background: rgba(245, 158, 11, 0.16);
-      color: var(--warning);
-    }
+        @keyframes noteCardEnter {
+            0% {
+                opacity: 0;
+                transform: translateY(8px) scale(0.985);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        .note-card-enter {
+            opacity: 0;
+            animation: noteCardEnter 320ms var(--apple-spring) forwards;
+        }
 
-    .status-pill.error {
-      background: rgba(239, 68, 68, 0.16);
-      color: var(--danger);
-    }
+        @keyframes editorFadeIn {
+            0% { opacity: 0.4; transform: translateY(4px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .editor-transition {
+            animation: editorFadeIn 240ms var(--apple-spring);
+        }
 
-    /* Note list column */
-    .note-list-col {
-      width: 280px;
-      background: var(--bg-list);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-    }
+        /* ==================== POPOVER & MODAL HIỆU ỨNG MACOS ==================== */
+        .popover-menu {
+            transform-origin: top left;
+            transition:
+                opacity 200ms var(--apple-spring),
+                transform 240ms var(--apple-spring);
+        }
+        .popover-hidden {
+            opacity: 0;
+            transform: translateY(-6px) scale(0.95);
+            pointer-events: none;
+        }
+        .popover-visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
 
-    .list-header {
-      padding: 14px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-    }
+        .modal-backdrop-smooth {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 260ms var(--apple-ease);
+        }
+        .modal-backdrop-smooth.modal-open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-card-smooth {
+            opacity: 0;
+            transform: translate3d(0, 14px, 0) scale(0.92);
+            filter: blur(4px);
+            transition:
+                opacity 280ms var(--apple-spring),
+                transform 360ms var(--apple-spring),
+                filter 260ms ease;
+        }
+        .modal-backdrop-smooth.modal-open .modal-card-smooth {
+            opacity: 1;
+            transform: translate3d(0, 0, 0) scale(1);
+            filter: blur(0px);
+        }
 
-    .list-header h2 { font-size: 15px; font-weight: 700; }
-    .list-count { font-size: 11.5px; color: var(--text-muted); }
+        /* ==================== ANIMATION KHI XÓA NHÃN PHÂN LOẠI ==================== */
+        .label-row-exit {
+            overflow: hidden !important;
+            opacity: 0 !important;
+            transform: translateX(-14px) scale(0.95) !important;
+            max-height: 0px !important;
+            margin-top: 0px !important;
+            margin-bottom: 0px !important;
+            padding-top: 0px !important;
+            padding-bottom: 0px !important;
+            border-color: transparent !important;
+            pointer-events: none !important;
+            transition:
+                opacity 220ms cubic-bezier(0.22, 1, 0.36, 1),
+                transform 280ms cubic-bezier(0.19, 1, 0.22, 1),
+                max-height 300ms cubic-bezier(0.19, 1, 0.22, 1),
+                margin 300ms cubic-bezier(0.19, 1, 0.22, 1),
+                padding 300ms cubic-bezier(0.19, 1, 0.22, 1),
+                border-color 200ms ease !important;
+        }
 
-    .btn-new {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      border: none;
-      background: var(--accent);
-      color: #fff;
-      font-size: 18px;
-      cursor: pointer;
-      display: grid;
-      place-items: center;
-    }
+        /* ==================== HỆ THỐNG MÀU NỀN & HỌA TIẾT GIẤY ==================== */
+        .bg-tone-default { background-color: #ffffff; }
+        html.dark .bg-tone-default { background-color: #09090b; }
 
-    .btn-new:hover { background: var(--accent-hover); }
+        .bg-tone-cream { background-color: #fdfbf7; }
+        html.dark .bg-tone-cream { background-color: #161412; }
 
-    .search-wrap { padding: 10px 12px; border-bottom: 1px solid var(--border); }
-    .search-input {
-      width: 100%;
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
-      color: var(--text-main);
-      padding: 8px 10px;
-      border-radius: 8px;
-      font-size: 12.5px;
-      outline: none;
-    }
+        .bg-tone-mint { background-color: #f4fbf8; }
+        html.dark .bg-tone-mint { background-color: #101916; }
 
-    .notes-scroll { padding: 10px; overflow-y: auto; flex: 1; }
+        .bg-tone-sky { background-color: #f4f8fd; }
+        html.dark .bg-tone-sky { background-color: #10151d; }
 
-    .note-card {
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid transparent;
-      cursor: pointer;
-      margin-bottom: 8px;
-      background: rgba(255, 255, 255, 0.015);
-    }
+        .bg-tone-lavender { background-color: #f8f6fd; }
+        html.dark .bg-tone-lavender { background-color: #16121e; }
 
-    .note-card:hover { background: var(--bg-hover); }
-    .note-card.active {
-      background: rgba(108, 99, 255, 0.14);
-      border-color: rgba(108, 99, 255, 0.45);
-    }
+        .bg-tone-rose { background-color: #fdf6f7; }
+        html.dark .bg-tone-rose { background-color: #1c1215; }
 
-    .note-card-title {
-      font-size: 13.5px;
-      font-weight: 600;
-      margin-bottom: 4px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+        .bg-pattern-dots {
+            background-image: radial-gradient(rgba(100, 116, 139, 0.22) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        html.dark .bg-pattern-dots {
+            background-image: radial-gradient(rgba(161, 161, 170, 0.16) 1px, transparent 1px);
+        }
 
-    .note-card-preview {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-bottom: 8px;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
+        .bg-pattern-lines {
+            background-image: linear-gradient(to bottom, rgba(100, 116, 139, 0.12) 1px, transparent 1px);
+            background-size: 100% 30px;
+        }
+        html.dark .bg-pattern-lines {
+            background-image: linear-gradient(to bottom, rgba(161, 161, 170, 0.1) 1px, transparent 1px);
+        }
 
-    .note-card-meta {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 11px;
-      color: var(--text-muted);
-    }
+        .bg-pattern-grid {
+            background-image:
+                linear-gradient(to right, rgba(100, 116, 139, 0.1) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(100, 116, 139, 0.1) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        html.dark .bg-pattern-grid {
+            background-image:
+                linear-gradient(to right, rgba(161, 161, 170, 0.08) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(161, 161, 170, 0.08) 1px, transparent 1px);
+        }
 
-    /* Editor area */
-    .editor-col {
-      flex: 1;
-      background: var(--bg-editor);
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-    }
+        /* ==================== KHUNG ĐỌC KÍNH MỜ KHI CÓ ẢNH NỀN ==================== */
+        .has-bg-image .reading-glass-card {
+            background: rgba(255, 253, 249, 0.78);
+            backdrop-filter: blur(18px) saturate(140%);
+            -webkit-backdrop-filter: blur(18px) saturate(140%);
+            border: 1px solid rgba(255, 255, 255, 0.65);
+            box-shadow: 0 12px 36px -8px rgba(15, 23, 42, 0.08);
+            border-radius: 20px;
+            padding: 28px 32px;
+        }
+        html.dark .has-bg-image .reading-glass-card {
+            background: rgba(18, 20, 26, 0.78);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 16px 42px -8px rgba(0, 0, 0, 0.45);
+        }
 
-    .topbar {
-      padding: 10px 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
+        /* ==================== ĐỊNH DẠNG VÙNG SOẠN THẢO RICH TEXT & BẢNG WORD ==================== */
+        #note-title-input, #editor-content {
+            font-family: var(--editor-font);
+            transition: font-family 180ms ease;
+        }
 
-    .cat-pills { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        #editor-content {
+            user-select: text;
+            outline: none;
+            line-height: 1.75;
+            min-height: 360px;
+        }
 
-    .cat-pill {
-      border: 1px solid var(--border);
-      background: var(--bg-surface);
-      color: var(--text-muted);
-      padding: 5px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-    }
+        #editor-content:empty:before {
+            content: attr(data-placeholder);
+            color: #9ca3af;
+            pointer-events: none;
+            display: block;
+        }
+        html.dark #editor-content:empty:before {
+            color: #52525b;
+        }
 
-    .cat-pill.active {
-      color: #fff;
-      border-color: var(--accent);
-      background: rgba(108, 99, 255, 0.22);
-    }
+        #editor-content h2 {
+            font-size: 1.45rem;
+            font-weight: 700;
+            margin-top: 1.25rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
 
-    .toolbar {
-      padding: 8px 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
-      font-size: 12.5px;
-    }
+        #editor-content ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+            margin: 0.65rem 0;
+        }
 
-    .tool-btn, .tool-select {
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
-      color: var(--text-main);
-      border-radius: 7px;
-      padding: 5px 9px;
-      font-size: 12px;
-      cursor: pointer;
-    }
+        #editor-content li {
+            margin: 0.25rem 0;
+        }
 
-    .tool-btn:hover { background: var(--bg-hover); }
+        .todo-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            margin: 0.45rem 0;
+        }
+        .todo-item input[type="checkbox"] {
+            margin-top: 0.32rem;
+            width: 1rem;
+            height: 1rem;
+            accent-color: #4f46e5;
+            cursor: pointer;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+        .todo-item.completed .todo-text {
+            text-decoration: line-through;
+            opacity: 0.55;
+        }
 
-    .editor-body {
-      flex: 1;
-      overflow-y: auto;
-      padding: 28px 36px;
-    }
-
-    .editor-meta {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-bottom: 10px;
-    }
-
-    .title-input {
-      width: 100%;
-      background: transparent;
-      border: none;
-      color: var(--text-main);
-      font-size: 28px;
-      font-weight: 700;
-      outline: none;
-      margin-bottom: 14px;
-    }
-
-    .rich-editor {
-      min-height: 260px;
-      outline: none;
-      font-size: 15px;
-      line-height: 1.7;
-      color: var(--text-main);
-    }
-
-    .rich-editor table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 12px 0;
-    }
-
-    .rich-editor th, .rich-editor td {
-      border: 1px solid var(--border);
-      padding: 8px 10px;
-      text-align: left;
-    }
-
-    /* Modal */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.65);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 50;
-      padding: 16px;
-    }
-
-    .modal-backdrop.open { display: flex; }
-
-    .modal {
-      width: 100%;
-      max-width: 440px;
-      background: var(--bg-sidebar);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px;
-    }
-
-    .modal-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-    }
-
-    .modal-header h3 { font-size: 15px; font-weight: 700; }
-
-    .close-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      font-size: 20px;
-      cursor: pointer;
-    }
-
-    .status-banner {
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    .field-label {
-      display: block;
-      font-size: 12.5px;
-      font-weight: 600;
-      margin-bottom: 6px;
-    }
-
-    .row-input {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 6px;
-    }
-
-    .text-input {
-      flex: 1;
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
-      color: var(--text-main);
-      padding: 9px 11px;
-      border-radius: 8px;
-      font-size: 13px;
-      outline: none;
-    }
-
-    .btn-primary {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 9px 14px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .btn-primary:hover { background: var(--accent-hover); }
-
-    .hint { font-size: 11.5px; color: var(--text-muted); line-height: 1.45; }
-  </style>
+        /* Bảng phong cách Microsoft Word */
+        .word-table-wrapper {
+            margin: 1rem 0;
+            overflow-x: auto;
+            border-radius: 10px;
+        }
+        table.word-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            font-size: 0.935rem;
+            background: rgba(255, 255, 255, 0.65);
+        }
+        html.dark table.word-table {
+            background: rgba(24, 24, 27, 0.65);
+        }
+        table.word-table th,
+        table.word-table td {
+            border: 1px solid #cbd5e1;
+            padding: 9px 12px;
+            text-align: left;
+            vertical-align: top;
+            min-width: 72px;
+            word-wrap: break-word;
+            transition: background-color 140ms ease;
+        }
+        html.dark table.word-table th,
+        html.dark table.word-table td {
+            border-color: #3f3f46;
+        }
+        table.word-table th {
+            background-color: rgba(79, 70, 229, 0.08);
+            font-weight: 600;
+        }
+        html.dark table.word-table th {
+            background-color: rgba(99, 102, 241, 0.16);
+        }
+        table.word-table td:focus,
+        table.word-table th:focus {
+            outline: 2px solid #6366f1;
+            outline-offset: -2px;
+            background-color: rgba(99, 102, 241, 0.05);
+        }
+    </style>
 </head>
-<body>
-  <aside class="sidebar">
-    <div>
-      <div class="brand">
-        <div class="brand-icon" aria-hidden="true">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M5 3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.83a2 2 0 0 0-.59-1.42l-3.83-3.83A2 2 0 0 0 15.17 3H5zm3 6h8v2H8V9zm0 4h8v2H8v-2zm0 4h5v2H8v-2z"/>
-          </svg>
-        </div>
-        <div>
-          <div class="brand-title">Sổ Tay</div>
-          <div class="brand-sub">Ghi chú cá nhân</div>
-        </div>
-      </div>
+<body class="macos-wallpaper text-gray-800 dark:text-zinc-100 h-screen w-screen flex items-center justify-center md:p-3 lg:p-4 overflow-hidden">
 
-      <div class="nav-scroll">
-        <div class="section-label">Thư viện</div>
-        <button class="nav-item active" data-filter="all" onclick="setFilter('all')">
-          <div class="nav-left"><span>Tất cả ghi chú</span></div>
-          <span class="badge" id="count-all">0</span>
-        </button>
-        <button class="nav-item" data-filter="pinned" onclick="setFilter('pinned')">
-          <div class="nav-left"><span>Đã ghim</span></div>
-          <span class="badge" id="count-pinned">0</span>
-        </button>
-        <button class="nav-item" data-filter="trash" onclick="setFilter('trash')">
-          <div class="nav-left"><span>Thùng rác</span></div>
-          <span class="badge" id="count-trash">0</span>
-        </button>
+    <!-- ==================== KHUNG CỬA SỔ ỨNG DỤNG MACOS ==================== -->
+    <div id="app-window" class="macos-window-frame w-full h-full md:rounded-2xl overflow-hidden flex bg-white/95 dark:bg-zinc-950/95 border border-gray-200/80 dark:border-zinc-800/90 relative">
 
-        <div class="section-label">Nhãn phân loại</div>
-        <div id="sidebar-categories"></div>
-      </div>
-    </div>
+        <!-- Lớp phủ nền tối trên thiết bị di động khi mở Sidebar -->
+        <div id="mobile-sidebar-backdrop" onclick="toggleMobileSidebar(false)" class="fixed inset-0 bg-black/40 backdrop-blur-xs z-30 hidden md:hidden transition-opacity"></div>
 
-    <div class="cloud-box">
-      <button class="cloud-trigger" onclick="openCloudModal()">
-        <span>Đám mây</span>
-        <span class="status-pill syncing" id="sidebar-cloud-status">Đang kết nối...</span>
-      </button>
-    </div>
-  </aside>
+        <!-- ==================== CỘT 1: THANH ĐIỀU HƯỚNG BÊN TRÁI (MACOS VIBRANCY SIDEBAR) ==================== -->
+        <aside id="sidebar" class="macos-sidebar-vibrancy fixed md:static inset-y-0 left-0 z-40 w-60 flex-shrink-0 border-r border-gray-200/80 dark:border-zinc-800/80 flex flex-col justify-between transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-out">
+            <div>
+                <!-- Logo App Sổ Tay + Nút Sáng/Tối -->
+                <div class="h-14 px-4 flex items-center justify-between border-b border-gray-200/50 dark:border-zinc-800/60">
+                    <div class="flex items-center gap-2.5 select-none">
+                        <div class="app-logo-badge w-8 h-8 rounded-[10px] bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-600 flex items-center justify-center text-white flex-shrink-0">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="4.5" y="3" width="15" height="18" rx="3.5" fill="white" fill-opacity="0.16" stroke="currentColor" stroke-width="1.9"/>
+                                <path d="M8.5 8H15.5M8.5 12H13.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+                                <path d="M13.5 17.5L17.8 13.2C18.3 12.7 19.1 12.7 19.6 13.2C20.1 13.7 20.1 14.5 19.6 15L15.3 19.3L12.8 19.8L13.5 17.5Z" fill="white" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="leading-tight">
+                            <div class="text-sm font-bold tracking-tight text-gray-900 dark:text-white">Sổ Tay</div>
+                            <div class="text-[10px] font-medium text-gray-400 dark:text-zinc-500">Ghi chú cá nhân</div>
+                        </div>
+                    </div>
+                </div>
 
-  <section class="note-list-col">
-    <div class="list-header">
-      <div>
-        <h2 id="list-heading">Tất cả ghi chú</h2>
-        <div class="list-count" id="list-subcount">0 ghi chú</div>
-      </div>
-      <button class="btn-new" title="Ghi chú mới" onclick="createNote()">+</button>
-    </div>
-    <div class="search-wrap">
-      <input class="search-input" id="search-input" type="text" placeholder="Tìm tiêu đề, nội dung..." oninput="renderNoteList()" />
-    </div>
-    <div class="notes-scroll" id="notes-list"></div>
-  </section>
+                <!-- Danh sách thư mục hệ thống -->
+                <nav class="px-2.5 pt-3.5 space-y-0.5">
+                    <div class="px-3 pb-1.5 text-[11px] font-bold uppercase tracking-wider text-gray-700 dark:text-zinc-200">Thư viện</div>
 
-  <main class="editor-col">
-    <div class="topbar">
-      <div class="cat-pills" id="editor-cat-pills"></div>
-      <div style="display:flex; gap:8px;">
-        <button class="tool-btn" id="pin-btn" onclick="togglePin()">Ghim</button>
-        <button class="tool-btn" id="trash-btn" onclick="toggleTrash()">Xóa</button>
-      </div>
-    </div>
+                    <button onclick="setFilter('all')" data-filter="all" class="nav-item w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium transition-all cursor-pointer bg-indigo-600/10 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-300">
+                        <span class="flex items-center gap-2.5">
+                            <i data-lucide="layers" class="w-4 h-4"></i>
+                            <span>Tất cả ghi chú</span>
+                        </span>
+                        <span id="count-all" class="text-xs font-semibold px-1.5 py-0.5 rounded-md bg-white/70 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300">0</span>
+                    </button>
 
-    <div class="toolbar">
-      <select class="tool-select" onchange="document.execCommand('fontName', false, this.value)">
-        <option value="Inter">Inter</option>
-        <option value="Georgia">Georgia</option>
-        <option value="Courier New">Courier New</option>
-      </select>
-      <button class="tool-btn" onclick="document.execCommand('bold')"><b>B</b></button>
-      <button class="tool-btn" onclick="document.execCommand('italic')"><i>I</i></button>
-      <button class="tool-btn" onclick="document.execCommand('underline')"><u>U</u></button>
-      <button class="tool-btn" onclick="document.execCommand('formatBlock', false, 'H2')">H2</button>
-      <button class="tool-btn" onclick="document.execCommand('insertUnorderedList')">Danh sách</button>
-      <button class="tool-btn" onclick="insertTable()">Bảng</button>
-    </div>
+                    <button onclick="setFilter('pinned')" data-filter="pinned" class="nav-item w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium text-gray-600 dark:text-zinc-400 hover:bg-black/5 dark:hover:bg-white/5 transition-all cursor-pointer">
+                        <span class="flex items-center gap-2.5">
+                            <i data-lucide="pin" class="w-4 h-4"></i>
+                            <span>Đã ghim</span>
+                        </span>
+                        <span id="count-pinned" class="text-xs font-medium text-gray-400 dark:text-zinc-500">0</span>
+                    </button>
 
-    <div class="editor-body">
-      <div class="editor-meta" id="editor-meta">Chưa chọn ghi chú</div>
-      <input class="title-input" id="note-title" type="text" placeholder="Tiêu đề ghi chú..." oninput="onEditorChange()" />
-      <div class="rich-editor" id="note-content" contenteditable="true" oninput="onEditorChange()"></div>
-    </div>
-  </main>
+                    <button onclick="setFilter('trash')" data-filter="trash" class="nav-item w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium text-gray-600 dark:text-zinc-400 hover:bg-black/5 dark:hover:bg-white/5 transition-all cursor-pointer">
+                        <span class="flex items-center gap-2.5">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            <span>Thùng rác</span>
+                        </span>
+                        <span id="count-trash" class="text-xs font-medium text-gray-400 dark:text-zinc-500">0</span>
+                    </button>
+                </nav>
 
-  <!-- Cloud Modal -->
-  <div class="modal-backdrop" id="cloud-modal">
-    <div class="modal">
-      <div class="modal-header">
-        <h3>Đồng bộ Đám mây Đa Thiết Bị</h3>
-        <button class="close-btn" onclick="closeCloudModal()">&times;</button>
-      </div>
-
-      <div class="status-banner">
-        <div>
-          <div style="font-size:13px; font-weight:600;">Trạng thái kết nối</div>
-          <div class="hint">Tự động lưu & đồng bộ qua Workspace ID.</div>
-        </div>
-        <span class="status-pill syncing" id="modal-cloud-status">Đang kết nối...</span>
-      </div>
-
-      <label class="field-label" for="workspace-input">Mã đồng bộ không gian (Workspace ID)</label>
-      <div class="row-input">
-        <input class="text-input" id="workspace-input" type="text" placeholder="Ví dụ: nghia1902" />
-        <button class="btn-primary" onclick="connectWorkspace()">Kết nối</button>
-      </div>
-      <div class="hint">Nhập cùng một Workspace ID trên các thiết bị để dùng chung ghi chú.</div>
-    </div>
-  </div>
-
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-    import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-    import { getFirestore, doc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-
-    const FIREBASE_CONFIG = {
-      apiKey: "AIzaSyD-example-replace-if-needed",
-      authDomain: "note-application-7f0a6.firebaseapp.com",
-      projectId: "note-application-7f0a6",
-      storageBucket: "note-application-7f0a6.appspot.com",
-      messagingSenderId: "000000000000",
-      appId: "1:000000000000:web:000000000000"
-    };
-
-    const CATEGORIES = [
-      { id: 'ideas', name: 'Ý tưởng', color: '#f59e0b' },
-      { id: 'personal', name: 'Cá nhân', color: '#ec4899' },
-      { id: 'study', name: 'Học tập', color: '#6366f1' },
-      { id: 'work', name: 'Công việc', color: '#3b82f6' },
-      { id: 'machine', name: 'Machine', color: '#10b981' }
-    ];
-
-    const STORAGE_NOTES_KEY = 'sotay_notes_v1';
-    const STORAGE_WS_KEY = 'sotay_workspace_id_v1';
-
-    let state = {
-      notes: loadLocalNotes(),
-      activeNoteId: null,
-      filter: 'all',
-      workspaceId: localStorage.getItem(STORAGE_WS_KEY) || 'nghia1902',
-      cloudStatus: 'syncing',
-      cloudLabel: 'Đang kết nối...'
-    };
-
-    let db = null;
-    let auth = null;
-    let unsubscribeDoc = null;
-    let saveTimer = null;
-
-    function loadLocalNotes() {
-      try {
-        const raw = localStorage.getItem(STORAGE_NOTES_KEY);
-        if (raw) return JSON.parse(raw);
-      } catch (_) {}
-      return [{
-        id: 'welcome-note',
-        title: 'Chào mừng đến với Sổ Tay Đám Mây',
-        content: '<p>Ghi chú của bạn sẽ được lưu cục bộ và đồng bộ theo Workspace ID.</p>',
-        category: 'work',
-        pinned: true,
-        trashed: false,
-        updatedAt: Date.now()
-      }];
-    }
-
-    function saveLocalNotes() {
-      localStorage.setItem(STORAGE_NOTES_KEY, JSON.stringify(state.notes));
-    }
-
-    function setCloudStatus(status, label) {
-      state.cloudStatus = status;
-      state.cloudLabel = label;
-      ['sidebar-cloud-status', 'modal-cloud-status'].forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.textContent = label;
-        el.className = `status-pill ${status}`;
-      });
-    }
-
-    function renderCategoryIcon(color) {
-      return `<svg width="13" height="13" viewBox="0 0 24 24" fill="${color}" aria-hidden="true"><circle cx="12" cy="12" r="9"/></svg>`;
-    }
-
-    function renderSidebarCategories() {
-      const wrap = document.getElementById('sidebar-categories');
-      wrap.innerHTML = CATEGORIES.map(cat => {
-        const count = state.notes.filter(n => !n.trashed && n.category === cat.id).length;
-        const active = state.filter === `cat:${cat.id}` ? 'active' : '';
-        return `
-          <button class="nav-item ${active}" onclick="setFilter('cat:${cat.id}')">
-            <div class="nav-left">${renderCategoryIcon(cat.color)}<span>${cat.name}</span></div>
-            <span class="badge">${count}</span>
-          </button>
-        `;
-      }).join('');
-    }
-
-    function renderCounts() {
-      document.getElementById('count-all').textContent = state.notes.filter(n => !n.trashed).length;
-      document.getElementById('count-pinned').textContent = state.notes.filter(n => !n.trashed && n.pinned).length;
-      document.getElementById('count-trash').textContent = state.notes.filter(n => n.trashed).length;
-      renderSidebarCategories();
-    }
-
-    function getFilteredNotes() {
-      const q = (document.getElementById('search-input').value || '').trim().toLowerCase();
-      return state.notes
-        .filter(n => {
-          if (state.filter === 'trash') return n.trashed;
-          if (n.trashed) return false;
-          if (state.filter === 'pinned') return n.pinned;
-          if (state.filter.startsWith('cat:')) return n.category === state.filter.slice(4);
-          return true;
-        })
-        .filter(n => {
-          if (!q) return true;
-          const plain = (n.content || '').replace(/<[^>]+>/g, ' ').toLowerCase();
-          return (n.title || '').toLowerCase().includes(q) || plain.includes(q);
-        })
-        .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
-    }
-
-    window.renderNoteList = function() {
-      renderCounts();
-      const listEl = document.getElementById('notes-list');
-      const items = getFilteredNotes();
-      document.getElementById('list-subcount').textContent = `${items.length} ghi chú`;
-
-      if (!state.activeNoteId && items.length > 0) {
-        state.activeNoteId = items[0].id;
-      }
-
-      listEl.innerHTML = items.map(n => {
-        const preview = (n.content || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-        const active = n.id === state.activeNoteId ? 'active' : '';
-        return `
-          <div class="note-card ${active}" onclick="selectNote('${n.id}')">
-            <div class="note-card-title">${escapeHtml(n.title || 'Ghi chú chưa đặt tên')}</div>
-            <div class="note-card-preview">${escapeHtml(preview || 'Chưa có nội dung')}</div>
-            <div class="note-card-meta">
-              <span>${n.pinned ? 'Đã ghim' : ''}</span>
-              <span>${formatTime(n.updatedAt)}</span>
+                <!-- Nhãn phân loại tùy chỉnh (Folder Icons) -->
+                <div class="px-2.5 pt-5">
+                    <div class="px-3 pb-1.5 flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-gray-700 dark:text-zinc-200">Nhãn phân loại</span>
+                    </div>
+                    <div id="sidebar-labels-list" class="space-y-0.5 max-h-[42vh] overflow-y-auto pr-0.5">
+                        <!-- Render động bằng JS -->
+                    </div>
+                </div>
             </div>
-          </div>
-        `;
-      }).join('') || `<div class="hint" style="padding:12px;">Không có ghi chú phù hợp.</div>`;
 
-      renderEditor();
-    };
+            <!-- Chân thanh bên: Trạng thái đồng bộ đám mây -->
+            <div class="px-3.5 py-2.5 border-t border-gray-200/60 dark:border-zinc-800/80 flex items-center justify-between gap-2">
+                <button onclick="openCloudSettingsModal()" title="Cấu hình & Mã đồng bộ đám mây" class="inline-flex items-center gap-1.5 text-[11px] font-medium text-gray-500 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer">
+                    <i data-lucide="cloud" class="w-3.5 h-3.5 text-indigo-500"></i>
+                    <span>Đám mây</span>
+                </button>
+                <button id="cloud-status-badge" onclick="openCloudSettingsModal()" title="Xem trạng thái kết nối đám mây" class="inline-flex items-center gap-1.5 text-[11px] text-amber-600 dark:text-amber-400 font-medium px-2 py-0.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/15 transition-colors cursor-pointer">
+                    <span id="cloud-status-dot" class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                    <span id="cloud-status-text">Đang kết nối...</span>
+                </button>
+            </div>
+        </aside>
 
-    function renderEditor() {
-      const note = state.notes.find(n => n.id === state.activeNoteId);
-      const pillsWrap = document.getElementById('editor-cat-pills');
-      pillsWrap.innerHTML = CATEGORIES.map(cat => {
-        const active = note && note.category === cat.id ? 'active' : '';
-        return `
-          <button class="cat-pill ${active}" onclick="setNoteCategory('${cat.id}')">
-            ${renderCategoryIcon(cat.color)}<span>${cat.name}</span>
-          </button>
-        `;
-      }).join('');
+        <!-- ==================== CỘT 2: DANH SÁCH GHI CHÚ (THU GỌN / MỞ RỘNG MƯỢT MÀ) ==================== -->
+        <section id="note-list-panel" class="w-full md:w-72 flex-shrink-0 border-r border-gray-200/80 dark:border-zinc-800/80 bg-gray-50/70 dark:bg-zinc-900/60 flex flex-col h-full">
+            <!-- Đầu cột danh sách: Nút menu mobile + Tiêu đề thư mục + Nút thu gọn + Nút tạo mới -->
+            <div class="p-3.5 border-b border-gray-200/70 dark:border-zinc-800/80 space-y-2.5">
+                <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <button onclick="toggleMobileSidebar(true)" class="md:hidden p-1.5 rounded-lg text-gray-500 hover:bg-gray-200/70 dark:hover:bg-zinc-800 cursor-pointer">
+                            <i data-lucide="menu" class="w-4 h-4"></i>
+                        </button>
+                        <div class="min-w-0">
+                            <h2 id="current-folder-title" class="text-base font-bold tracking-tight text-gray-900 dark:text-white truncate">Tất cả ghi chú</h2>
+                            <p id="current-folder-subtitle" class="text-[11px] text-gray-400 dark:text-zinc-500">0 ghi chú</p>
+                        </div>
+                    </div>
 
-      const titleInput = document.getElementById('note-title');
-      const contentDiv = document.getElementById('note-content');
-      const metaDiv = document.getElementById('editor-meta');
-      const pinBtn = document.getElementById('pin-btn');
-      const trashBtn = document.getElementById('trash-btn');
+                    <div class="flex items-center gap-1 flex-shrink-0">
+                        <button onclick="createNewNote()" title="Tạo ghi chú mới" class="p-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white shadow-xs transition-all cursor-pointer">
+                            <i data-lucide="square-pen" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="toggleNoteListCollapse()" title="Thu gọn danh sách ghi chú" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:bg-gray-200/70 dark:hover:bg-zinc-800 transition-all cursor-pointer">
+                            <i data-lucide="panel-left-close" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
 
-      if (!note) {
-        titleInput.value = '';
-        contentDiv.innerHTML = '';
-        metaDiv.textContent = 'Chưa chọn ghi chú';
-        pinBtn.textContent = 'Ghim';
-        trashBtn.textContent = 'Xóa';
-        return;
-      }
+                <!-- Ô tìm kiếm kiểu Apple Notes -->
+                <div class="relative">
+                    <i data-lucide="search" class="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                    <input id="search-input" type="text" oninput="handleSearch(this.value)" placeholder="Tìm tiêu đề, nội dung..." class="w-full pl-8 pr-7 py-1.5 text-xs rounded-xl bg-white/90 dark:bg-zinc-800/90 border border-gray-200/80 dark:border-zinc-700/80 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 text-gray-800 dark:text-zinc-100 placeholder-gray-400 transition-all">
+                    <button id="clear-search-btn" onclick="clearSearch()" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-200 cursor-pointer">
+                        <i data-lucide="x-circle" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+            </div>
 
-      if (document.activeElement !== titleInput) {
-        titleInput.value = note.title || '';
-      }
-      if (document.activeElement !== contentDiv && contentDiv.innerHTML !== (note.content || '')) {
-        contentDiv.innerHTML = note.content || '';
-      }
+            <!-- Danh sách thẻ ghi chú -->
+            <div id="notes-container" class="flex-1 overflow-y-auto p-2.5 space-y-1.5">
+                <!-- Render động bằng JS -->
+            </div>
+        </section>
 
-      const words = (note.content || '').replace(/<[^>]+>/g, ' ').trim().split(/\s+/).filter(Boolean).length;
-      metaDiv.textContent = `Cập nhật ${formatTime(note.updatedAt)} • ${words} từ`;
-      pinBtn.textContent = note.pinned ? 'Bỏ ghim' : 'Ghim';
-      trashBtn.textContent = note.trashed ? 'Khôi phục' : 'Xóa';
-    }
+        <!-- ==================== CỘT 3: TRÌNH SOẠN THẢO GHI CHÚ ==================== -->
+        <main id="editor-panel" class="flex-1 flex flex-col h-full min-w-0 relative bg-tone-default transition-colors duration-300">
+            <!-- Lớp ảnh nền & lớp phủ hòa sắc tự động -->
+            <div id="editor-bg-image-layer" class="absolute inset-0 bg-cover bg-center pointer-events-none opacity-0 transition-opacity duration-500"></div>
+            <div id="editor-bg-tint-layer" class="absolute inset-0 pointer-events-none opacity-0 transition-opacity duration-500"></div>
 
-    window.setFilter = function(filter) {
-      state.filter = filter;
-      document.querySelectorAll('.nav-item[data-filter]').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.filter === filter);
-      });
-      const headingMap = {
-        all: 'Tất cả ghi chú',
-        pinned: 'Đã ghim',
-        trash: 'Thùng rác'
-      };
-      const catObj = filter.startsWith('cat:') ? CATEGORIES.find(c => c.id === filter.slice(4)) : null;
-      document.getElementById('list-heading').textContent = catObj ? catObj.name : (headingMap[filter] || 'Ghi chú');
-      state.activeNoteId = null;
-      renderNoteList();
-    };
+            <!-- Trạng thái trống khi chưa chọn ghi chú -->
+            <div id="empty-editor-state" class="hidden flex-1 flex flex-col items-center justify-center p-8 text-center relative z-10">
+                <button id="empty-expand-list-btn" onclick="toggleNoteListCollapse()" class="hidden mb-6 inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-300 text-xs font-semibold hover:bg-indigo-100 dark:hover:bg-indigo-500/25 transition-all cursor-pointer">
+                    <i data-lucide="panel-left-open" class="w-4 h-4"></i>
+                    <span>Mở danh sách ghi chú</span>
+                </button>
+                <div class="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 flex items-center justify-center mb-4">
+                    <i data-lucide="notebook-pen" class="w-8 h-8"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-zinc-100 mb-1">Chưa có ghi chú nào được chọn</h3>
+                <p class="text-sm text-gray-500 dark:text-zinc-400 max-w-xs mb-5">Chọn một ghi chú từ danh sách hoặc tạo ghi chú mới để bắt đầu viết ý tưởng của bạn.</p>
+                <button onclick="createNewNote()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium shadow-sm transition-all cursor-pointer">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <span>Tạo ghi chú mới</span>
+                </button>
+            </div>
 
-    window.selectNote = function(id) {
-      state.activeNoteId = id;
-      renderNoteList();
-    };
+            <!-- Giao diện trình soạn thảo chính -->
+            <div id="active-editor-wrapper" class="flex-1 flex flex-col h-full min-w-0 relative z-10">
+                <!-- Thanh công cụ trên cùng: Mở danh sách + Chọn Nhãn + Trạng thái lưu + Ghim/Xóa -->
+                <header class="px-4 py-2.5 border-b border-gray-200/70 dark:border-zinc-800/80 bg-white/75 dark:bg-zinc-950/75 backdrop-blur-xl flex flex-wrap items-center justify-between gap-2 z-20">
+                    <div class="flex items-center gap-2 min-w-0 flex-wrap">
+                        <!-- Nút mở lại danh sách ghi chú (hiện khi cột danh sách đang thu gọn) -->
+                        <button id="expand-list-btn" onclick="toggleNoteListCollapse()" class="hidden items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-500/25 text-xs font-semibold transition-all cursor-pointer">
+                            <i data-lucide="panel-left-open" class="w-3.5 h-3.5"></i>
+                            <span>Mở danh sách</span>
+                        </button>
 
-    window.createNote = function() {
-      const catId = state.filter.startsWith('cat:') ? state.filter.slice(4) : 'work';
-      const newNote = {
-        id: 'note_' + Date.now(),
-        title: '',
-        content: '',
-        category: catId,
-        pinned: false,
-        trashed: false,
-        updatedAt: Date.now()
-      };
-      state.notes.unshift(newNote);
-      state.activeNoteId = newNote.id;
-      saveLocalNotes();
-      renderNoteList();
-      scheduleCloudPush();
-      document.getElementById('note-title').focus();
-    };
+                        <!-- Bộ chọn Nhãn phân loại -->
+                        <div class="flex items-center gap-1 bg-gray-100/80 dark:bg-zinc-900/90 p-1 rounded-xl border border-gray-200/60 dark:border-zinc-800">
+                            <div id="editor-label-pills" class="flex items-center gap-1 flex-wrap">
+                                <!-- Render động bằng JS -->
+                            </div>
+                            <button onclick="openLabelManagerModal(null, this)" title="Tùy chỉnh nhãn phân loại" class="p-1 rounded-lg text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-zinc-800 transition-all cursor-pointer">
+                                <i data-lucide="settings-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
 
-    window.onEditorChange = function() {
-      const note = state.notes.find(n => n.id === state.activeNoteId);
-      if (!note) return;
-      note.title = document.getElementById('note-title').value;
-      note.content = document.getElementById('note-content').innerHTML;
-      note.updatedAt = Date.now();
-      saveLocalNotes();
-      renderNoteList();
-      scheduleCloudPush();
-    };
+                    <!-- Các hành động phải: Trạng thái lưu + Ghim + Khôi phục/Xóa -->
+                    <div class="flex items-center gap-1.5">
+                    <!-- Các hành động phải: Trạng thái lưu + Khôi phục + Chuyển Sáng/Tối -->
+                    <div class="flex items-center gap-2">
+                    <!-- Các hành động phải: Khôi phục + Chuyển Sáng/Tối -->
+                    <div class="flex items-center gap-2">
+                        <button id="restore-note-btn" onclick="restoreCurrentNote()" title="Khôi phục ghi chú" class="hidden items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-xs font-semibold hover:bg-emerald-100 transition-all cursor-pointer">
+                            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                            <span>Khôi phục</span>
+                        </button>
 
-    window.setNoteCategory = function(catId) {
-      const note = state.notes.find(n => n.id === state.activeNoteId);
-      if (!note) return;
-      note.category = catId;
-      note.updatedAt = Date.now();
-      saveLocalNotes();
-      renderNoteList();
-      scheduleCloudPush();
-    };
+                        <button id="theme-toggle-btn" onclick="toggleTheme()" role="switch" aria-label="Chuyển chế độ Sáng / Tối" title="Chuyển chế độ Sáng / Tối" class="theme-pill-switch cursor-pointer">
+                            <span class="theme-pill-label theme-pill-label-day">DAY<br>MODE</span>
+                            <span class="theme-pill-label theme-pill-label-night">NIGHT<br>MODE</span>
+                            <span class="theme-pill-knob">
+                                <span id="theme-icon-wrapper" class="inline-flex items-center justify-center">
+                                    <!-- SVG Mặt trăng & sao tím (Night Mode) / Mặt trời (Day Mode) -->
+                                </span>
+                            </span>
+                        </button>
+                    </div>
+                </header>
 
-    window.togglePin = function() {
-      const note = state.notes.find(n => n.id === state.activeNoteId);
-      if (!note) return;
-      note.pinned = !note.pinned;
-      note.updatedAt = Date.now();
-      saveLocalNotes();
-      renderNoteList();
-      scheduleCloudPush();
-    };
+                <!-- Thanh công cụ định dạng văn bản, Phông chữ, Hình nền & Bảng Word -->
+                <div id="formatting-toolbar" class="px-4 py-2 border-b border-gray-200/70 dark:border-zinc-800/80 bg-white/65 dark:bg-zinc-950/65 backdrop-blur-xl flex flex-wrap items-center gap-1.5 z-20">
+                    <!-- Bộ chọn Phông chữ (Aa) -->
+                    <div class="relative">
+                        <button id="font-picker-btn" onclick="toggleMenuPopover('font-popover', event)" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-medium bg-white/90 dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-700/80 hover:border-indigo-400 text-gray-700 dark:text-zinc-200 transition-all cursor-pointer">
+                            <span class="font-bold text-indigo-600 dark:text-indigo-400">Aa</span>
+                            <span id="current-font-label">Inter</span>
+                            <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-gray-400"></i>
+                        </button>
 
-    window.toggleTrash = function() {
-      const note = state.notes.find(n => n.id === state.activeNoteId);
-      if (!note) return;
-      note.trashed = !note.trashed;
-      note.updatedAt = Date.now();
-      state.activeNoteId = null;
-      saveLocalNotes();
-      renderNoteList();
-      scheduleCloudPush();
-    };
+                        <div id="font-popover" onclick="event.stopPropagation()" class="popover-menu popover-hidden absolute left-0 mt-2 w-64 rounded-2xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur-2xl shadow-macos-popover dark:shadow-macos-popover-dark border border-gray-200/80 dark:border-zinc-800 p-2 z-50">
+                            <div class="px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-zinc-500">Chọn phông chữ</div>
+                            <div id="font-options-list" class="space-y-1 mt-1"></div>
+                        </div>
+                    </div>
 
-    window.insertTable = function() {
-      const html = '<table><tr><th>Cột 1</th><th>Cột 2</th></tr><tr><td>Nội dung</td><td>Nội dung</td></tr></table><p><br></p>';
-      document.execCommand('insertHTML', false, html);
-      onEditorChange();
-    };
+                    <!-- Bộ chọn Hình nền & Giấy viết -->
+                    <div class="relative">
+                        <button id="bg-picker-btn" onclick="toggleMenuPopover('bg-popover', event)" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-medium bg-white/90 dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-700/80 hover:border-indigo-400 text-gray-700 dark:text-zinc-200 transition-all cursor-pointer">
+                            <i data-lucide="image" class="w-3.5 h-3.5 text-indigo-500"></i>
+                            <span>Hình nền</span>
+                            <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-gray-400"></i>
+                        </button>
 
-    window.openCloudModal = function() {
-      document.getElementById('workspace-input').value = state.workspaceId;
-      document.getElementById('cloud-modal').classList.add('open');
-    };
+                        <div id="bg-popover" onclick="event.stopPropagation()" class="popover-menu popover-hidden absolute left-0 mt-2 w-80 sm:w-96 rounded-2xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur-2xl shadow-macos-popover dark:shadow-macos-popover-dark border border-gray-200/80 dark:border-zinc-800 p-3.5 z-50 space-y-3.5 max-h-[82vh] overflow-y-auto">
+                            <!-- Ảnh nền nghệ thuật -->
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-zinc-500">Bộ sưu tập ảnh nền (12 mẫu)</span>
+                                    <button onclick="clearNoteBgImage()" class="text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">Tắt ảnh nền</button>
+                                </div>
+                                <div id="bg-image-presets-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-44 overflow-y-auto pr-0.5"></div>
+                            </div>
 
-    window.closeCloudModal = function() {
-      document.getElementById('cloud-modal').classList.remove('open');
-    };
+                            <!-- Dán link ảnh tùy chỉnh -->
+                            <div>
+                                <div class="flex gap-1.5">
+                                    <input id="custom-bg-url-input" type="url" placeholder="Dán đường dẫn ảnh (https://...)" class="flex-1 px-2.5 py-1.5 text-xs rounded-xl bg-gray-100/80 dark:bg-zinc-800 border border-gray-200/80 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/40">
+                                    <button onclick="applyCustomBgImageUrl()" class="px-2.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium cursor-pointer">Áp dụng</button>
+                                </div>
+                            </div>
 
-    window.connectWorkspace = function() {
-      const inputVal = (document.getElementById('workspace-input').value || '').trim();
-      const wsId = inputVal || 'nghia1902';
-      state.workspaceId = wsId;
-      localStorage.setItem(STORAGE_WS_KEY, wsId);
-      subscribeWorkspace(wsId);
-    };
+                            <!-- Thanh trượt độ rõ ảnh nền -->
+                            <div id="bg-opacity-control" class="space-y-1">
+                                <div class="flex justify-between text-[11px] text-gray-500 dark:text-zinc-400">
+                                    <span>Độ rõ ảnh nền</span>
+                                    <span id="bg-opacity-value">35%</span>
+                                </div>
+                                <input id="bg-opacity-slider" type="range" min="15" max="70" value="35" oninput="updateNoteBgImageOpacity(this.value)" class="w-full accent-indigo-600 cursor-pointer">
+                            </div>
 
-    function scheduleCloudPush() {
-      if (!db || !auth?.currentUser || !state.workspaceId) return;
-      setCloudStatus('syncing', 'Đang lưu...');
-      clearTimeout(saveTimer);
-      saveTimer = setTimeout(async () => {
-        try {
-          const ref = doc(db, 'workspaces', state.workspaceId);
-          await setDoc(ref, { notes: state.notes, updatedAt: Date.now() }, { merge: true });
-          setCloudStatus('connected', 'Đã đồng bộ');
-        } catch (err) {
-          console.error(err);
-          setCloudStatus('error', 'Lỗi kết nối');
+                            <div class="border-t border-gray-200/70 dark:border-zinc-800 pt-3 space-y-3">
+                                <!-- Tông màu giấy -->
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-zinc-500">Tông màu giấy</span>
+                                        <span id="bg-color-active-label" class="text-[11px] font-medium text-gray-500 dark:text-zinc-400">Mặc định</span>
+                                    </div>
+                                    <div id="bg-color-swatches" class="grid grid-cols-6 gap-2"></div>
+                                </div>
+
+                                <!-- Bề mặt giấy (Xem trước trực quan 4 kiểu) -->
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-zinc-500">Bề mặt giấy</span>
+                                        <span id="bg-pattern-active-label" class="text-[11px] font-medium text-gray-500 dark:text-zinc-400">Giấy trơn</span>
+                                    </div>
+                                    <div id="bg-pattern-options" class="grid grid-cols-4 gap-2"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="h-4 w-px bg-gray-200 dark:bg-zinc-800 mx-0.5"></div>
+
+                    <!-- Các nút định dạng văn bản cơ bản -->
+                    <button onclick="execFormat('bold')" title="In đậm (Ctrl+B)" class="p-1.5 rounded-lg text-gray-600 dark:text-zinc-300 hover:bg-gray-200/70 dark:hover:bg-zinc-800 transition-colors cursor-pointer">
+                        <i data-lucide="bold" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="execFormat('italic')" title="In nghiêng (Ctrl+I)" class="p-1.5 rounded-lg text-gray-600 dark:text-zinc-300 hover:bg-gray-200/70 dark:hover:bg-zinc-800 transition-colors cursor-pointer">
+                        <i data-lucide="italic" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="execFormat('underline')" title="Gạch chân (Ctrl+U)" class="p-1.5 rounded-lg text-gray-600 dark:text-zinc-300 hover:bg-gray-200/70 dark:hover:bg-zinc-800 transition-colors cursor-pointer">
+                        <i data-lucide="underline" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="toggleHeading()" title="Tiêu đề mục" class="p-1.5 rounded-lg text-gray-600 dark:text-zinc-300 hover:bg-gray-200/70 dark:hover:bg-zinc-800 transition-colors cursor-pointer">
+                        <i data-lucide="heading-2" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="execFormat('insertUnorderedList')" title="Danh sách gạch đầu dòng" class="p-1.5 rounded-lg text-gray-600 dark:text-zinc-300 hover:bg-gray-200/70 dark:hover:bg-zinc-800 transition-colors cursor-pointer">
+                        <i data-lucide="list" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="insertTodoItem()" title="Thêm ô kiểm việc cần làm" class="p-1.5 rounded-lg text-gray-600 dark:text-zinc-300 hover:bg-gray-200/70 dark:hover:bg-zinc-800 transition-colors cursor-pointer">
+                        <i data-lucide="check-square" class="w-4 h-4"></i>
+                    </button>
+
+                    <!-- Chèn Bảng kiểu Microsoft Word -->
+                    <div class="relative">
+                        <button onclick="toggleMenuPopover('table-popover', event)" title="Chèn bảng kiểu Word" class="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-medium text-gray-600 dark:text-zinc-300 hover:bg-gray-200/70 dark:hover:bg-zinc-800 transition-colors cursor-pointer">
+                            <i data-lucide="table" class="w-4 h-4 text-indigo-500"></i>
+                            <span>Bảng</span>
+                        </button>
+
+                        <div id="table-popover" onclick="event.stopPropagation()" class="popover-menu popover-hidden absolute left-0 mt-2 w-56 rounded-2xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur-2xl shadow-macos-popover dark:shadow-macos-popover-dark border border-gray-200/80 dark:border-zinc-800 p-3 z-50">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-zinc-500">Chèn bảng</span>
+                                <span id="table-grid-size-label" class="text-xs font-bold text-indigo-600 dark:text-indigo-400">3 × 3</span>
+                            </div>
+                            <div id="table-grid-picker" class="grid grid-cols-8 gap-1 mb-2.5"></div>
+                            <label class="flex items-center gap-2 text-xs text-gray-600 dark:text-zinc-300 cursor-pointer pt-1 border-t border-gray-200/70 dark:border-zinc-800">
+                                <input id="table-include-header" type="checkbox" checked class="accent-indigo-600 rounded">
+                                <span>Có hàng tiêu đề đậm</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thanh công cụ nổi khi trỏ chuột vào bên trong Bảng Word -->
+                <div id="table-context-toolbar" class="hidden px-4 py-1.5 bg-indigo-50/90 dark:bg-indigo-950/80 border-b border-indigo-200/70 dark:border-indigo-800/60 backdrop-blur-md flex flex-wrap items-center gap-1.5 text-xs z-10">
+                    <span class="font-semibold text-indigo-700 dark:text-indigo-300 mr-1 flex items-center gap-1">
+                        <i data-lucide="table-2" class="w-3.5 h-3.5"></i> Bảng:
+                    </span>
+                    <button onclick="tableAction('addRowAbove')" class="px-2 py-1 rounded-lg bg-white/80 dark:bg-zinc-900 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-gray-700 dark:text-zinc-200 cursor-pointer">+ Hàng trên</button>
+                    <button onclick="tableAction('addRowBelow')" class="px-2 py-1 rounded-lg bg-white/80 dark:bg-zinc-900 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-gray-700 dark:text-zinc-200 cursor-pointer">+ Hàng dưới</button>
+                    <button onclick="tableAction('addColLeft')" class="px-2 py-1 rounded-lg bg-white/80 dark:bg-zinc-900 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-gray-700 dark:text-zinc-200 cursor-pointer">+ Cột trái</button>
+                    <button onclick="tableAction('addColRight')" class="px-2 py-1 rounded-lg bg-white/80 dark:bg-zinc-900 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-gray-700 dark:text-zinc-200 cursor-pointer">+ Cột phải</button>
+                    <div class="h-3.5 w-px bg-indigo-200 dark:bg-indigo-800 mx-0.5"></div>
+                    <button onclick="tableAction('deleteRow')" class="px-2 py-1 rounded-lg bg-white/80 dark:bg-zinc-900 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-rose-600 dark:text-rose-400 cursor-pointer">Xóa hàng</button>
+                    <button onclick="tableAction('deleteCol')" class="px-2 py-1 rounded-lg bg-white/80 dark:bg-zinc-900 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-rose-600 dark:text-rose-400 cursor-pointer">Xóa cột</button>
+                    <button onclick="tableAction('deleteTable')" class="px-2 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-medium cursor-pointer">Xóa bảng</button>
+                </div>
+
+                <!-- Khu vực viết nội dung chính -->
+                <div id="editor-scroll-area" class="flex-1 overflow-y-auto px-5 sm:px-10 md:px-14 py-7">
+                    <div id="reading-surface" class="reading-glass-card max-w-3xl mx-auto transition-all duration-300">
+                        <!-- Thông tin thời gian & bộ đếm từ -->
+                        <div class="flex flex-wrap items-center gap-2 text-xs text-gray-400 dark:text-zinc-500 mb-3">
+                            <span class="inline-flex items-center gap-1">
+                                <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                                <span id="note-updated-at">Cập nhật lúc --:--</span>
+                            </span>
+                            <span>•</span>
+                            <span id="note-word-count">0 từ, 0 ký tự</span>
+                        </div>
+
+                        <!-- Ô nhập tiêu đề ghi chú -->
+                        <input id="note-title-input" type="text" oninput="handleEditorInput()" placeholder="Tiêu đề ghi chú..." class="w-full bg-transparent text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 dark:text-white placeholder-gray-300 dark:placeholder-zinc-700 focus:outline-none mb-4">
+
+                        <!-- Vùng soạn thảo Rich Text -->
+                        <div id="editor-content" contenteditable="true" data-placeholder="Bắt đầu viết nội dung, ý tưởng hoặc danh sách công việc tại đây..." class="text-base text-gray-700 dark:text-zinc-200"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ==================== MODAL QUẢN LÝ & TÙY CHỈNH ICON NHÃN PHÂN LOẠI (MACOS SHEET) ==================== -->
+    <div id="label-manager-modal" onclick="closeLabelManagerModal()" class="modal-backdrop-smooth fixed inset-0 z-50 bg-black/35 backdrop-blur-xs flex items-center justify-center p-4">
+        <div id="label-manager-card" onclick="event.stopPropagation()" class="modal-card-smooth w-full max-w-sm rounded-2xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur-2xl shadow-macos-popover dark:shadow-macos-popover-dark border border-gray-200/80 dark:border-zinc-800 overflow-hidden">
+            <!-- Header hộp thoại gọn gàng -->
+            <div class="px-4 py-3 border-b border-gray-200/70 dark:border-zinc-800 flex items-center justify-between bg-gray-50/70 dark:bg-zinc-950/50">
+                <div class="flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-lg bg-indigo-500/12 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                        <i data-lucide="folder-plus" class="w-3.5 h-3.5"></i>
+                    </span>
+                    <span id="label-modal-title" class="text-xs font-semibold text-gray-800 dark:text-zinc-100">Thư mục mới</span>
+                </div>
+                <button onclick="closeLabelManagerModal()" title="Đóng" class="p-1 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:bg-gray-200/70 dark:hover:bg-zinc-800 transition-colors cursor-pointer">
+                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
+
+            <div class="p-4 space-y-4">
+                <!-- Xem trước trực quan & Nhập tên thư mục -->
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 dark:text-zinc-400 mb-1.5">Tên thư mục</label>
+                        <div class="relative flex items-center">
+                            <span id="label-preview-icon-badge" class="absolute left-2.5 w-7 h-7 rounded-lg bg-indigo-500/10 text-indigo-500 flex items-center justify-center pointer-events-none">
+                                <i data-lucide="folder" class="w-4 h-4"></i>
+                            </span>
+                            <input id="label-name-input" type="text" maxlength="24" onkeydown="if(event.key==='Enter'){event.preventDefault();saveCustomLabel();}" placeholder="Nhập tên thư mục..." class="w-full pl-11 pr-3 py-2 text-sm font-medium rounded-xl bg-gray-100/80 dark:bg-zinc-800/90 border border-gray-200/80 dark:border-zinc-700 focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 dark:text-zinc-400 mb-1.5">Biểu tượng (24 mẫu)</label>
+                        <div id="label-icon-picker" class="grid grid-cols-6 gap-1.5 max-h-36 overflow-y-auto pr-0.5"></div>
+                    </div>
+                </div>
+
+                <!-- Danh sách thư mục hiện có (thu gọn gọn gàng) -->
+                <div class="pt-2 border-t border-gray-200/70 dark:border-zinc-800">
+                    <div class="text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-zinc-500 mb-2">Thư mục hiện có</div>
+                    <div id="manage-labels-list" class="space-y-1 max-h-36 overflow-y-auto pr-0.5"></div>
+                </div>
+            </div>
+
+            <!-- Thanh xác nhận chân hộp thoại chuẩn macOS -->
+            <div class="px-4 py-3 border-t border-gray-200/70 dark:border-zinc-800 bg-gray-50/70 dark:bg-zinc-950/50 flex items-center justify-end gap-2">
+                <button id="cancel-edit-label-btn" onclick="handleCancelLabelModal()" class="px-3.5 py-1.5 rounded-xl text-xs font-medium bg-white dark:bg-zinc-800 border border-gray-200/80 dark:border-zinc-700 text-gray-600 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-700 transition-colors cursor-pointer">Hủy</button>
+                <button onclick="saveCustomLabel()" class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs font-semibold shadow-xs transition-all cursor-pointer">
+                    <span id="save-label-btn-text">Tạo thư mục</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL XÁC NHẬN XÓA VĨNH VIỄN ==================== -->
+    <div id="confirm-modal" onclick="closeConfirmModal()" class="modal-backdrop-smooth fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+        <div onclick="event.stopPropagation()" class="modal-card-smooth w-full max-w-sm rounded-2xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur-2xl shadow-macos-popover dark:shadow-macos-popover-dark border border-gray-200/80 dark:border-zinc-800 p-5 text-center">
+            <div class="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-500/15 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto mb-3">
+                <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+            </div>
+            <h3 class="text-base font-bold text-gray-900 dark:text-white mb-1">Xóa vĩnh viễn ghi chú?</h3>
+            <p class="text-xs text-gray-500 dark:text-zinc-400 mb-5">Hành động này không thể hoàn tác. Ghi chú sẽ bị xóa khỏi bộ nhớ trình duyệt.</p>
+            <div class="flex items-center justify-center gap-2.5">
+                <button onclick="closeConfirmModal()" class="flex-1 px-4 py-2 rounded-xl text-xs font-semibold bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors cursor-pointer">Hủy bỏ</button>
+                <button id="confirm-delete-btn" class="flex-1 px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white transition-colors cursor-pointer">Xóa vĩnh viễn</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL CẤU HÌNH ĐỒNG BỘ ĐÁM MÂY ==================== -->
+    <div id="cloud-settings-modal" onclick="closeCloudSettingsModal()" class="modal-backdrop-smooth fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+        <div onclick="event.stopPropagation()" class="modal-card-smooth w-full max-w-md rounded-2xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur-2xl shadow-macos-popover dark:shadow-macos-popover-dark border border-gray-200/80 dark:border-zinc-800 overflow-hidden">
+            <div class="px-4 py-3 border-b border-gray-200/70 dark:border-zinc-800 flex items-center justify-between bg-gray-50/70 dark:bg-zinc-950/50">
+                <div class="flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-lg bg-indigo-500/12 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                        <i data-lucide="cloud" class="w-3.5 h-3.5"></i>
+                    </span>
+                    <span class="text-xs font-semibold text-gray-800 dark:text-zinc-100">Đồng bộ Đám mây Đa Thiết Bị</span>
+                </div>
+                <button onclick="closeCloudSettingsModal()" title="Đóng" class="p-1 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:bg-gray-200/70 dark:hover:bg-zinc-800 transition-colors cursor-pointer">
+                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
+
+            <div class="p-4 space-y-4 text-xs">
+                <div class="p-3 rounded-xl bg-indigo-50/70 dark:bg-indigo-500/10 border border-indigo-200/60 dark:border-indigo-500/20 text-gray-700 dark:text-zinc-300 space-y-1.5">
+                    <div class="font-semibold text-indigo-700 dark:text-indigo-300 flex items-center justify-between">
+                        <span>Trạng thái kết nối</span>
+                        <span id="modal-cloud-state-label" class="px-2 py-0.5 rounded-md bg-white/80 dark:bg-zinc-900 font-bold">Đang kiểm tra</span>
+                    </div>
+                    <p class="text-[11px] text-gray-500 dark:text-zinc-400 leading-relaxed">
+                        Mọi ghi chú và thư mục được tự động đồng bộ lên đám mây theo thời gian thực để bạn mở trên bất kỳ trình duyệt nào.
+                    </p>
+                </div>
+
+                <!-- Mã đồng bộ dùng chung giữa các thiết bị -->
+                <div class="space-y-1.5">
+                    <label class="block font-semibold text-gray-700 dark:text-zinc-200">Mã đồng bộ không gian (Workspace ID)</label>
+                    <div class="flex gap-1.5">
+                        <input id="cloud-workspace-input" type="text" placeholder="Ví dụ: sotay-cua-toi-2026" class="flex-1 px-3 py-2 rounded-xl bg-gray-100/80 dark:bg-zinc-800 border border-gray-200/80 dark:border-zinc-700 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/40">
+                        <button onclick="copyWorkspaceId()" title="Sao chép mã" class="px-2.5 py-2 rounded-xl bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-200 font-medium cursor-pointer">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <button onclick="applyWorkspaceId()" class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold cursor-pointer">Kết nối</button>
+                    </div>
+                    <p class="text-[11px] text-gray-400 dark:text-zinc-500">Nhập cùng một Mã đồng bộ trên điện thoại và máy tính để dùng chung toàn bộ ghi chú.</p>
+                </div>
+
+                <!-- Cấu hình dự án đám mây riêng (tùy chọn khi tự host lên Vercel) -->
+                <div class="pt-2 border-t border-gray-200/70 dark:border-zinc-800 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="font-semibold text-gray-700 dark:text-zinc-200">Cấu hình máy chủ riêng (khi deploy Vercel)</span>
+                        <span class="text-[10px] text-gray-400">JSON Config</span>
+                    </div>
+                    <textarea id="cloud-custom-config-input" rows="4" placeholder='{"apiKey":"...","authDomain":"...","projectId":"..."}' class="w-full p-2.5 rounded-xl bg-gray-100/80 dark:bg-zinc-800 border border-gray-200/80 dark:border-zinc-700 font-mono text-[11px] focus:outline-none focus:ring-2 focus:ring-indigo-500/40"></textarea>
+                    <div id="cloud-config-feedback" class="hidden text-[11px] font-medium"></div>
+                    <div class="flex justify-end gap-2">
+                        <button onclick="saveCustomCloudConfig()" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold cursor-pointer">Lưu & Kết nối Đám mây</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MÃ JAVASCRIPT LOGIC ỨNG DỤNG & ĐỒNG BỘ ĐÁM MÂY ==================== -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import {
+            getFirestore,
+            doc,
+            setDoc,
+            deleteDoc,
+            onSnapshot,
+            collection
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // ==================== HẰNG CẤU HÌNH & KHÓA LƯU TRỮ ====================
+        const THEME_KEY = 'sotay_theme_v1';
+        const FONT_DEFAULT_KEY = 'sotay_default_font_v1';
+        const LIST_COLLAPSED_KEY = 'sotay_list_collapsed_v1';
+
+        const FONT_CONFIG = {
+            inter: { label: 'Inter', desc: 'Hiện đại, sắc nét', css: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" },
+            lora: { label: 'Lora', desc: 'Cổ điển, trang nhã', css: "'Lora', Georgia, serif" },
+            mono: { label: 'JetBrains Mono', desc: 'Lập trình, kỹ thuật', css: "'JetBrains Mono', monospace" },
+            mali: { label: 'Mali', desc: 'Viết tay tự nhiên', css: "'Mali', cursive" },
+            nunito: { label: 'Nunito', desc: 'Mềm mại, thân thiện', css: "'Nunito', sans-serif" }
+        };
+
+        const BG_COLOR_CONFIG = {
+            default: { label: 'Mặc định', swatch: '#ffffff', darkSwatch: '#18181b', className: 'bg-tone-default' },
+            cream: { label: 'Kem ấm', swatch: '#fdf6e7', darkSwatch: '#292218', className: 'bg-tone-cream' },
+            mint: { label: 'Bạc hà', swatch: '#e6f7ef', darkSwatch: '#152922', className: 'bg-tone-mint' },
+            sky: { label: 'Trời nhạt', swatch: '#e8f2fe', darkSwatch: '#162233', className: 'bg-tone-sky' },
+            lavender: { label: 'Oải hương', swatch: '#f1ebfe', darkSwatch: '#221933', className: 'bg-tone-lavender' },
+            rose: { label: 'Hồng phấn', swatch: '#fcebef', darkSwatch: '#2e1920', className: 'bg-tone-rose' }
+        };
+
+        const BG_PATTERN_CONFIG = {
+            none: { label: 'Giấy trơn', className: '' },
+            dots: { label: 'Chấm bi', className: 'bg-pattern-dots' },
+            lines: { label: 'Kẻ ngang', className: 'bg-pattern-lines' },
+            grid: { label: 'Ô vuông', className: 'bg-pattern-grid' }
+        };
+
+        const BG_IMAGE_PRESETS = [
+            { id: 'mist-forest', label: 'Rừng sương', url: 'https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1400&q=80' },
+            { id: 'calm-ocean', label: 'Biển lặng', url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80' },
+            { id: 'minimal-desk', label: 'Góc làm việc', url: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=1400&q=80' },
+            { id: 'mountain-sunset', label: 'Hoàng hôn núi', url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1400&q=80' },
+            { id: 'starry-sky', label: 'Đêm đầy sao', url: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1400&q=80' },
+            { id: 'cherry-blossom', label: 'Hoa anh đào', url: 'https://images.unsplash.com/photo-1522383225653-ed111181a951?auto=format&fit=crop&w=1400&q=80' },
+            { id: 'autumn-leaves', label: 'Mùa thu vàng', url: 'https://images.unsplash.com/photo-1507783548227-544c3b8fc065?auto=format&fit=crop&w=1400&q=80' },
+            { id: 'cozy-coffee', label: 'Cà phê sáng', url: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1400&q=80' },
+            { id: 'zen-botanical', label: 'Lá xanh dịu', url: 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&w=1400&q=80' },
+            { id: 'aurora-night', label: 'Cực quang', url: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?auto=format&fit=crop&w=1400&q=80' },
+            { id: 'lavender-field', label: 'Oải hương', url: 'https://images.unsplash.com/photo-1499002238440-d264edd596ec?auto=format&fit=crop&w=1400&q=80' },
+            { id: 'pastel-clouds', label: 'Mây chiều hồng', url: 'https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?auto=format&fit=crop&w=1400&q=80' }
+        ];
+
+        const LABEL_ICON_CHOICES = [
+            { icon: 'briefcase', title: 'Công việc', color: 'text-blue-500', badgeBg: 'bg-blue-500/12 text-blue-600 dark:text-blue-400', svg: '<path d="M9 4.5A2.5 2.5 0 0 1 11.5 2h1A2.5 2.5 0 0 1 15 4.5V6h3.5A2.5 2.5 0 0 1 21 8.5v9a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5v-9A2.5 2.5 0 0 1 5.5 6H9V4.5Zm1.5 0V6h3V4.5a1 1 0 0 0-1-1h-1a1 1 0 0 0-1 1ZM3 12.2v1.3h6.5v-.75a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v.75H21v-1.3H3Z"/>' },
+            { icon: 'heart', title: 'Cá nhân', color: 'text-rose-500', badgeBg: 'bg-rose-500/12 text-rose-600 dark:text-rose-400', svg: '<path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z"/>' },
+            { icon: 'lightbulb', title: 'Ý tưởng', color: 'text-amber-500', badgeBg: 'bg-amber-500/12 text-amber-600 dark:text-amber-400', svg: '<path d="M12 2a7 7 0 0 0-4.473 12.382c.682.57 1.158 1.337 1.333 2.186l.09.432h6.1l.09-.432c.175-.85.65-1.617 1.333-2.186A7 7 0 0 0 12 2ZM9.25 18.5a.75.75 0 0 0 0 1.5h5.5a.75.75 0 0 0 0-1.5h-5.5Zm1.25 2.5a.75.75 0 0 0 0 1.5h3a.75.75 0 0 0 0-1.5h-3Z"/>' },
+            { icon: 'book-open', title: 'Học tập', color: 'text-indigo-500', badgeBg: 'bg-indigo-500/12 text-indigo-600 dark:text-indigo-400', svg: '<path d="M11.25 5.337c0-.355-.186-.676-.401-.959a1.647 1.647 0 0 1-.349-1.003c0-1.036 1.007-1.875 2.25-1.875S15 2.34 15 3.375c0 .369-.128.713-.349 1.003-.215.283-.401.604-.401.959v.033c.88-.18 1.81-.275 2.77-.275 1.353 0 2.641.187 3.82.528a.75.75 0 0 1 .54.72v12.43a.75.75 0 0 1-.966.718 12.71 12.71 0 0 0-3.394-.458c-1.57 0-3.046.314-4.32.878a.75.75 0 0 1-.604 0 10.677 10.677 0 0 0-4.32-.878c-1.18 0-2.323.162-3.394.458a.75.75 0 0 1-.966-.718V6.343a.75.75 0 0 1 .54-.72 13.97 13.97 0 0 1 3.82-.528c.96 0 1.89.095 2.77.275v-.033Z"/>' },
+            { icon: 'wallet', title: 'Tài chính', color: 'text-emerald-500', badgeBg: 'bg-emerald-500/12 text-emerald-600 dark:text-emerald-400', svg: '<path d="M2.25 7.5A3.75 3.75 0 0 1 6 3.75h11.25a.75.75 0 0 1 0 1.5H6A2.25 2.25 0 0 0 3.75 7.5v.379c.653-.245 1.36-.379 2.1-.379H18.75A3 3 0 0 1 21.75 10.5v6.75a3 3 0 0 1-3 3H5.85a3.6 3.6 0 0 1-3.6-3.6V7.5Zm15 5.25a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z"/>' },
+            { icon: 'home', title: 'Gia đình', color: 'text-orange-500', badgeBg: 'bg-orange-500/12 text-orange-600 dark:text-orange-400', svg: '<path d="M11.47 2.47a.75.75 0 0 1 1.06 0l8.25 8.25a.75.75 0 0 1-1.06 1.06l-.72-.72V19.5A2.25 2.25 0 0 1 16.75 21.75h-2.5a.75.75 0 0 1-.75-.75v-4.5a1.5 1.5 0 0 0-3 0V21a.75.75 0 0 1-.75.75h-2.5A2.25 2.25 0 0 1 5 19.5v-8.44l-.72.72a.75.75 0 0 1-1.06-1.06l8.25-8.25Z"/>' },
+            { icon: 'plane', title: 'Du lịch', color: 'text-sky-500', badgeBg: 'bg-sky-500/12 text-sky-600 dark:text-sky-400', svg: '<path d="M21 15.5v-2.2l-7.5-4.7V3.5a1.5 1.5 0 0 0-3 0v5.1L3 13.3v2.2l7.5-2.3v5.1l-2.2 1.6V21.5l3.7-1.1 3.7 1.1v-1.6l-2.2-1.6v-5.1L21 15.5Z"/>' },
+            { icon: 'star', title: 'Quan trọng', color: 'text-yellow-500', badgeBg: 'bg-yellow-500/12 text-yellow-600 dark:text-yellow-400', svg: '<path d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z"/>' },
+            { icon: 'code-2', title: 'Lập trình', color: 'text-violet-500', badgeBg: 'bg-violet-500/12 text-violet-600 dark:text-violet-400', svg: '<path d="M4.5 3.75A2.25 2.25 0 0 0 2.25 6v12A2.25 2.25 0 0 0 4.5 20.25h15A2.25 2.25 0 0 0 21.75 18V6A2.25 2.25 0 0 0 19.5 3.75h-15Zm5.03 5.47a.75.75 0 0 1 0 1.06L7.31 12.5l2.22 2.22a.75.75 0 1 1-1.06 1.06l-2.75-2.75a.75.75 0 0 1 0-1.06l2.75-2.75a.75.75 0 0 1 1.06 0Zm4.94 0a.75.75 0 0 1 1.06 0l2.75 2.75a.75.75 0 0 1 0 1.06l-2.75 2.75a.75.75 0 1 1-1.06-1.06l2.22-2.22-2.22-2.22a.75.75 0 0 1 0-1.06Z"/>' },
+            { icon: 'music', title: 'Âm nhạc', color: 'text-pink-500', badgeBg: 'bg-pink-500/12 text-pink-600 dark:text-pink-400', svg: '<path d="M19.952 1.651a.75.75 0 0 1 .298.599V16.303a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.403-4.909l2.311-.66a1.5 1.5 0 0 0 1.088-1.442V6.994l-9 2.572v9.737a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.402-4.909l2.31-.66a1.5 1.5 0 0 0 1.088-1.442V5.25a.75.75 0 0 1 .544-.721l10.5-3a.75.75 0 0 1 .658.122Z"/>' },
+            { icon: 'target', title: 'Mục tiêu', color: 'text-red-500', badgeBg: 'bg-red-500/12 text-red-600 dark:text-red-400', svg: '<path d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm0 3a6.75 6.75 0 1 1 0 13.5 6.75 6.75 0 0 1 0-13.5Zm0 3a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5Zm0 2.25a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z"/>' },
+            { icon: 'folder', title: 'Thư mục', color: 'text-slate-500', badgeBg: 'bg-slate-500/12 text-slate-600 dark:text-slate-400', svg: '<path d="M19.5 21a3 3 0 0 0 3-3v-4.5a3 3 0 0 0-3-3h-15a3 3 0 0 0-3 3V18a3 3 0 0 0 3 3h15ZM1.5 10.146V6a3 3 0 0 1 3-3h5.379a2.25 2.25 0 0 1 1.59.659l2.122 2.121c.14.141.331.22.53.22H19.5a3 3 0 0 1 3 3v1.146A4.483 4.483 0 0 0 19.5 9h-15a4.483 4.483 0 0 0-3 1.146Z"/>' },
+            { icon: 'bookmark', title: 'Đánh dấu', color: 'text-teal-500', badgeBg: 'bg-teal-500/12 text-teal-600 dark:text-teal-400', svg: '<path d="M6.32 2.577a49.255 49.255 0 0 1 11.36 0c1.497.174 2.57 1.46 2.57 2.93V21a.75.75 0 0 1-1.085.67L12 18.089l-7.165 3.583A.75.75 0 0 1 3.75 21V5.507c0-1.47 1.073-2.756 2.57-2.93Z"/>' },
+            { icon: 'flame', title: 'Ưu tiên cao', color: 'text-orange-600', badgeBg: 'bg-orange-500/12 text-orange-600 dark:text-orange-400', svg: '<path d="M12.963 2.286a.75.75 0 0 0-1.071-.136 9.742 9.742 0 0 0-3.539 6.176 7.547 7.547 0 0 1-1.705-1.715.75.75 0 0 0-1.152-.082A9 9 0 1 0 15.68 4.534a7.46 7.46 0 0 1-2.717-2.248ZM15.75 14.25a3.75 3.75 0 1 1-7.313-1.172c.628.465 1.35.81 2.133 1a5.99 5.99 0 0 1 1.925-3.546 3.75 3.75 0 0 1 3.255 3.718Z"/>' },
+            { icon: 'camera', title: 'Kỷ niệm', color: 'text-cyan-500', badgeBg: 'bg-cyan-500/12 text-cyan-600 dark:text-cyan-400', svg: '<path d="M12 9a3.75 3.75 0 1 0 0 7.5A3.75 3.75 0 0 0 12 9Z"/><path fill-rule="evenodd" d="M9.344 3.071a49.52 49.52 0 0 1 5.312 0c.967.052 1.83.585 2.332 1.39l.821 1.317c.24.383.645.643 1.11.71.386.054.77.113 1.152.177 1.432.239 2.429 1.493 2.429 2.909V18a3 3 0 0 1-3 3h-15a3 3 0 0 1-3-3V9.574c0-1.416.997-2.67 2.429-2.909.382-.064.766-.123 1.151-.178a1.56 1.56 0 0 0 1.11-.71l.822-1.315a2.942 2.942 0 0 1 2.332-1.39ZM6.75 12.75a5.25 5.25 0 1 1 10.5 0 5.25 5.25 0 0 1-10.5 0Zm12-1.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd"/>' },
+            { icon: 'sparkles', title: 'Sáng tạo', color: 'text-fuchsia-500', badgeBg: 'bg-fuchsia-500/12 text-fuchsia-600 dark:text-fuchsia-400', svg: '<path d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z"/>' },
+            { icon: 'shopping-bag', title: 'Mua sắm', color: 'text-lime-600', badgeBg: 'bg-lime-500/12 text-lime-700 dark:text-lime-400', svg: '<path fill-rule="evenodd" d="M7.5 6v.75H5.513c-.96 0-1.764.724-1.865 1.679l-1.263 12A1.875 1.875 0 0 0 4.25 22.5h15.5a1.875 1.875 0 0 0 1.865-2.071l-1.263-12a1.875 1.875 0 0 0-1.865-1.679H16.5V6a4.5 4.5 0 1 0-9 0ZM12 3a3 3 0 0 0-3 3v.75h6V6a3 3 0 0 0-3-3Zm-3 8.25a3 3 0 1 0 6 0v-.75a.75.75 0 0 1 1.5 0v.75a4.5 4.5 0 1 1-9 0v-.75a.75.75 0 0 1 1.5 0v.75Z" clip-rule="evenodd"/>' },
+            { icon: 'calendar', title: 'Lịch trình', color: 'text-indigo-600', badgeBg: 'bg-indigo-500/12 text-indigo-600 dark:text-indigo-400', svg: '<path d="M12.75 12.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM7.5 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM8.25 17.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM9.75 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM10.5 17.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM12.75 17.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM14.25 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM15 17.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM16.5 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM15 12.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM16.5 13.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z"/><path fill-rule="evenodd" d="M6.75 2.25A.75.75 0 0 1 7.5 3v1.5h9V3A.75.75 0 0 1 18 3v1.5h.75a3 3 0 0 1 3 3v11.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V7.5a3 3 0 0 1 3-3H6V3a.75.75 0 0 1 .75-.75Zm13.5 9a1.5 1.5 0 0 0-1.5-1.5H5.25a1.5 1.5 0 0 0-1.5 1.5v7.5a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5v-7.5Z" clip-rule="evenodd"/>' },
+            { icon: 'shield-check', title: 'Bảo mật', color: 'text-emerald-600', badgeBg: 'bg-emerald-500/12 text-emerald-700 dark:text-emerald-400', svg: '<path fill-rule="evenodd" d="M12.516 2.17a.75.75 0 0 0-1.032 0 11.209 11.209 0 0 1-7.877 3.08.75.75 0 0 0-.722.515A12.74 12.74 0 0 0 2.25 9.75c0 5.942 4.064 10.933 9.563 12.348a.749.749 0 0 0 .374 0c5.499-1.415 9.563-6.406 9.563-12.348 0-1.39-.223-2.73-.635-3.985a.75.75 0 0 0-.722-.516l-.143.001c-2.996 0-5.717-1.17-7.734-3.08Zm3.094 8.016a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clip-rule="evenodd"/>' },
+            { icon: 'trophy', title: 'Thành tựu', color: 'text-amber-600', badgeBg: 'bg-amber-500/12 text-amber-700 dark:text-amber-400', svg: '<path fill-rule="evenodd" d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 0 0-.584.859 6.753 6.753 0 0 0 6.138 5.6 6.73 6.73 0 0 0 2.743 1.346A6.707 6.707 0 0 1 9.279 15H8.54c-1.036 0-1.875.84-1.875 1.875V19.5h-.75a2.25 2.25 0 0 0-2.25 2.25c0 .414.336.75.75.75h15a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-2.25-2.25h-.75v-2.625c0-1.036-.84-1.875-1.875-1.875h-.739a6.706 6.706 0 0 1-1.112-3.173 6.73 6.73 0 0 0 2.743-1.347 6.753 6.753 0 0 0 6.139-5.6.75.75 0 0 0-.585-.858 47.077 47.077 0 0 0-3.07-.543V2.62a.75.75 0 0 0-.658-.744 49.22 49.22 0 0 0-6.093-.377c-2.063 0-4.096.128-6.093.377a.75.75 0 0 0-.657.744Zm0 2.629c0 1.196.312 2.32.857 3.294A5.266 5.266 0 0 1 3.16 5.337a45.6 45.6 0 0 1 2.006-.343v.256Zm13.5 0v-.256c.674.1 1.343.214 2.006.343a5.265 5.265 0 0 1-2.863 3.207 6.72 6.72 0 0 0 .857-3.294Z" clip-rule="evenodd"/>' },
+            { icon: 'gift', title: 'Quà tặng', color: 'text-rose-500', badgeBg: 'bg-rose-500/12 text-rose-600 dark:text-rose-400', svg: '<path d="M9.375 3a1.875 1.875 0 0 0 0 3.75h1.875v4.5H3.375A1.875 1.875 0 0 1 1.5 9.375v-.75c0-1.036.84-1.875 1.875-1.875h3.193A3.375 3.375 0 0 1 12 2.753a3.375 3.375 0 0 1 5.432 3.997h3.943c1.035 0 1.875.84 1.875 1.875v.75c0 1.036-.84 1.875-1.875 1.875H12.75v-4.5h1.875a1.875 1.875 0 1 0-1.875-1.875V6.75h-1.5V4.875C11.25 3.839 10.41 3 9.375 3ZM11.25 12.75H3v6.75a2.25 2.25 0 0 0 2.25 2.25h6v-9ZM12.75 12.75v9h6.75a2.25 2.25 0 0 0 2.25-2.25v-6.75h-9Z"/>' },
+            { icon: 'coffee', title: 'Thư giãn', color: 'text-amber-700', badgeBg: 'bg-amber-600/12 text-amber-700 dark:text-amber-400', svg: '<path d="M4 7.5A1.5 1.5 0 0 1 5.5 6h10A1.5 1.5 0 0 1 17 7.5V8h1.5A3.5 3.5 0 0 1 22 11.5v1A3.5 3.5 0 0 1 18.5 16h-1.69A6.502 6.502 0 0 1 10.5 21h-1A6.5 6.5 0 0 1 3 14.5v-7h1Zm13 2.5v4h1.5a1.5 1.5 0 0 0 1.5-1.5v-1A1.5 1.5 0 0 0 18.5 10H17ZM7.25 2.5a.75.75 0 0 1 .75.75v1a.75.75 0 0 1-1.5 0v-1a.75.75 0 0 1 .75-.75Zm3.5 0a.75.75 0 0 1 .75.75v1a.75.75 0 0 1-1.5 0v-1a.75.75 0 0 1 .75-.75Zm3.5 0a.75.75 0 0 1 .75.75v1a.75.75 0 0 1-1.5 0v-1a.75.75 0 0 1 .75-.75Z"/>' },
+            { icon: 'globe', title: 'Khám phá', color: 'text-blue-600', badgeBg: 'bg-blue-500/12 text-blue-600 dark:text-blue-400', svg: '<path d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM6.262 6.072a8.25 8.25 0 1 0 10.562-.766 4.5 4.5 0 0 1-1.318 1.357L14.25 7.5l.165.33a.809.809 0 0 1-1.086 1.085l-.602-.302a1.125 1.125 0 0 0-1.006 0l-.602.302a.809.809 0 0 1-1.086-1.085l.165-.33-1.256-.837a4.5 4.5 0 0 1-1.318-1.357 8.338 8.338 0 0 0-1.362.766Z"/>' },
+            { icon: 'bolt', title: 'Năng lượng', color: 'text-yellow-500', badgeBg: 'bg-yellow-500/12 text-yellow-600 dark:text-yellow-400', svg: '<path fill-rule="evenodd" d="M14.615 1.595a.75.75 0 0 1 .359.852L12.982 9.75h7.268a.75.75 0 0 1 .548 1.262l-10.5 11.25a.75.75 0 0 1-1.272-.71l1.992-7.302H3.75a.75.75 0 0 1-.548-1.262l10.5-11.25a.75.75 0 0 1 .913-.143Z" clip-rule="evenodd"/>' }
+        ];
+
+        function renderSolidLabelIcon(iconKey, sizeClass = 'w-4 h-4', extraClass = '') {
+            const meta = LABEL_ICON_CHOICES.find(i => i.icon === iconKey) || LABEL_ICON_CHOICES[11];
+            return `<svg class="${sizeClass} ${extraClass} flex-shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${meta.svg}</svg>`;
         }
-      }, 450);
-    }
 
-    function subscribeWorkspace(wsId) {
-      if (!db || !auth?.currentUser) return;
-      if (unsubscribeDoc) {
-        unsubscribeDoc();
-        unsubscribeDoc = null;
-      }
-      setCloudStatus('syncing', 'Đang đồng bộ...');
-      const ref = doc(db, 'workspaces', wsId);
-      unsubscribeDoc = onSnapshot(ref, async (snap) => {
-        try {
-          if (snap.exists() && Array.isArray(snap.data().notes)) {
-            state.notes = snap.data().notes;
-            saveLocalNotes();
+        const DEFAULT_LABELS = [
+            { id: 'work', name: 'Công việc', icon: 'briefcase' },
+            { id: 'personal', name: 'Cá nhân', icon: 'heart' },
+            { id: 'ideas', name: 'Ý tưởng', icon: 'lightbulb' },
+            { id: 'study', name: 'Học tập', icon: 'book-open' }
+        ];
+
+        // ==================== BIẾN TRẠNG THÁI ỨNG DỤNG & ĐÁM MÂY ====================
+        let notes = [];
+        let labels = [...DEFAULT_LABELS];
+        let currentFilter = 'all';
+        let activeNoteId = null;
+        let searchQuery = '';
+        let defaultFont = 'inter';
+        let isNoteListCollapsed = false;
+        let saveTimeout = null;
+        let activeTableCell = null;
+        let editingLabelId = null;
+        let selectedLabelIcon = 'folder';
+        let popFilterKey = null;
+
+        let db = null;
+        let auth = null;
+        let currentUser = null;
+        let appId = typeof __app_id !== 'undefined' ? __app_id : 'sotay-cloud-app';
+        let workspaceId = 'default-workspace';
+        let unsubscribeNotes = null;
+        let unsubscribeLabels = null;
+        let isCloudReady = false;
+
+        // ==================== KHỞI TẠO ỨNG DỤNG & KẾT NỐI ĐÁM MÂY ====================
+        async function initApp() {
+            loadTheme();
+            loadDefaultFont();
+            loadListCollapseState();
+
+            renderFontOptions();
+            renderBgControls();
+            renderTableGridPicker();
+            setupEditorEventListeners();
+
+            // Khởi tạo kết nối Đám mây (Firestore)
+            await initCloudSync();
+
+            document.addEventListener('click', closeAllPopovers);
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeAllPopovers();
+                    closeLabelManagerModal();
+                    closeConfirmModal();
+                    closeCloudSettingsModal();
+                }
+            });
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        async function initCloudSync() {
+            try {
+                // Cấu hình kết nối đám mây riêng của bạn (đã tích hợp sẵn cho Vercel)
+                const BUILTIN_FIREBASE_CONFIG = {
+                    apiKey: "AIzaSyCiHG2qkCH_wR7ZFbKhJ_rBwrN39Vie4SM",
+                    authDomain: "note-application-7f0a6.firebaseapp.com",
+                    projectId: "note-application-7f0a6",
+                    storageBucket: "note-application-7f0a6.firebasestorage.app",
+                    messagingSenderId: "379772894814",
+                    appId: "1:379772894814:web:77236b233dc4961c05fecf",
+                    measurementId: "G-E70RC3LFJG"
+                };
+
+                let firebaseConfig = null;
+                if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+                    firebaseConfig = typeof __firebase_config === 'string'
+                        ? JSON.parse(__firebase_config)
+                        : __firebase_config;
+                } else if (window.__CUSTOM_CLOUD_CONFIG__) {
+                    firebaseConfig = window.__CUSTOM_CLOUD_CONFIG__;
+                } else {
+                    firebaseConfig = BUILTIN_FIREBASE_CONFIG;
+                }
+
+                if (!firebaseConfig || !firebaseConfig.apiKey) {
+                    updateCloudStatus('offline', 'Chưa cấu hình máy chủ');
+                    seedInitialSampleDataInMemory();
+                    renderAll();
+                    if (notes[0]) selectNote(notes[0].id, false);
+                    return;
+                }
+
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                // RULE 3: Luôn xác thực trước khi truy vấn Firestore
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                currentUser = auth.currentUser;
+                workspaceId = currentUser?.uid || 'shared-workspace';
+                isCloudReady = true;
+
+                updateCloudStatus('connected', 'Đã đồng bộ');
+                startRealtimeListeners();
+            } catch (err) {
+                console.error('Lỗi kết nối đám mây:', err);
+                updateCloudStatus('error', 'Lỗi kết nối');
+                seedInitialSampleDataInMemory();
+                renderAll();
+            }
+        }
+
+        function startRealtimeListeners() {
+            if (!db || !currentUser) return;
+
+            if (unsubscribeNotes) unsubscribeNotes();
+            if (unsubscribeLabels) unsubscribeLabels();
+
+            // RULE 1: Đường dẫn chuẩn /artifacts/{appId}/public/data/{collectionName}
+            // Dùng không gian công khai theo workspaceId để mở được trên mọi trình duyệt
+            const safeWs = workspaceId.replace(/[^a-zA-Z0-9_-]/g, '_');
+            const notesColRef = collection(db, 'artifacts', appId, 'public', 'data', `notes_${safeWs}`);
+            const labelsColRef = collection(db, 'artifacts', appId, 'public', 'data', `labels_${safeWs}`);
+
+            let initialNotesLoaded = false;
+            let initialLabelsLoaded = false;
+
+            unsubscribeLabels = onSnapshot(labelsColRef, async (snapshot) => {
+                if (snapshot.empty && !initialLabelsLoaded) {
+                    initialLabelsLoaded = true;
+                    for (const lbl of DEFAULT_LABELS) {
+                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', `labels_${safeWs}`, lbl.id), lbl);
+                    }
+                    return;
+                }
+                initialLabelsLoaded = true;
+                const fetchedLabels = [];
+                snapshot.forEach(d => fetchedLabels.push({ id: d.id, ...d.data() }));
+                if (fetchedLabels.length > 0) {
+                    labels = fetchedLabels.sort((a, b) => (a.order || 0) - (b.order || 0));
+                }
+                renderAll();
+            }, (error) => {
+                console.error('Lỗi đồng bộ nhãn:', error);
+            });
+
+            unsubscribeNotes = onSnapshot(notesColRef, async (snapshot) => {
+                if (snapshot.empty && !initialNotesLoaded) {
+                    initialNotesLoaded = true;
+                    await seedDefaultNotesToCloud(safeWs);
+                    return;
+                }
+                initialNotesLoaded = true;
+
+                const fetchedNotes = [];
+                snapshot.forEach(d => fetchedNotes.push({ id: d.id, ...d.data() }));
+                notes = fetchedNotes;
+
+                if (!activeNoteId || !notes.some(n => n.id === activeNoteId)) {
+                    const firstAvailable = getFilteredNotes()[0];
+                    if (firstAvailable) {
+                        activeNoteId = firstAvailable.id;
+                        renderAll();
+                        selectNote(activeNoteId, false);
+                    } else {
+                        renderAll();
+                        showEmptyEditorState();
+                    }
+                } else {
+                    renderAll();
+                    // Cập nhật nội dung nếu thay đổi từ thiết bị khác (không ghi đè khi đang gõ)
+                    const activeEl = document.activeElement;
+                    const isTyping = activeEl && (activeEl.id === 'note-title-input' || activeEl.id === 'editor-content');
+                    if (!isTyping) {
+                        const current = notes.find(n => n.id === activeNoteId);
+                        if (current) {
+                            document.getElementById('note-title-input').value = current.title || '';
+                            document.getElementById('editor-content').innerHTML = current.content || '';
+                            updateEditorMetadata(current);
+                        }
+                    }
+                }
+            }, (error) => {
+                console.error('Lỗi đồng bộ ghi chú:', error);
+                updateCloudStatus('error', 'Mất đồng bộ');
+            });
+        }
+
+        async function seedDefaultNotesToCloud(safeWs) {
+            if (!db || !currentUser) return;
+            const now = Date.now();
+            const samples = [
+                {
+                    id: 'note-welcome-cloud',
+                    title: 'Chào mừng đến với Sổ Tay Đám Mây',
+                    content: '<p>Toàn bộ ghi chú và thư mục của bạn hiện đã được <b>tự động đồng bộ trên đám mây</b> theo thời gian thực.</p><div class="todo-item completed"><input type="checkbox" checked><span class="todo-text">Mở Sổ Tay trên bất kỳ trình duyệt hay thiết bị nào</span></div><div class="todo-item"><input type="checkbox"><span class="todo-text">Dùng chung Mã đồng bộ ở góc dưới bên trái để kết nối nhiều máy</span></div>',
+                    label: 'work',
+                    font: 'inter',
+                    bgColor: 'default',
+                    bgPattern: 'none',
+                    bgImage: '',
+                    bgImageOpacity: 35,
+                    pinned: true,
+                    trashed: false,
+                    updatedAt: now
+                }
+            ];
+            for (const item of samples) {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', `notes_${safeWs}`, item.id), item);
+            }
+        }
+
+        function seedInitialSampleDataInMemory() {
+            const now = Date.now();
+            labels = [...DEFAULT_LABELS];
+            notes = [
+                {
+                    id: 'note-1',
+                    title: 'Kế hoạch triển khai tuần mới',
+                    content: '<p>Tổng hợp các đầu việc quan trọng cần hoàn thành trong tuần này:</p><div class="todo-item completed"><input type="checkbox" checked><span class="todo-text">Hoàn thiện giao diện Sổ Tay phong cách macOS</span></div><div class="todo-item"><input type="checkbox"><span class="todo-text">Kết nối lưu trữ đám mây đa thiết bị</span></div>',
+                    label: 'work',
+                    font: 'inter',
+                    bgColor: 'default',
+                    bgPattern: 'none',
+                    bgImage: '',
+                    bgImageOpacity: 35,
+                    pinned: true,
+                    trashed: false,
+                    updatedAt: now
+                }
+            ];
+        }
+
+        function updateCloudStatus(state, text) {
+            const badge = document.getElementById('cloud-status-badge');
+            const dot = document.getElementById('cloud-status-dot');
+            const label = document.getElementById('cloud-status-text');
+            const modalLabel = document.getElementById('modal-cloud-state-label');
+            if (!badge || !dot || !label) return;
+
+            label.textContent = text;
+            if (modalLabel) modalLabel.textContent = text;
+
+            if (state === 'connected') {
+                badge.className = 'inline-flex items-center gap-1.5 text-[11px] text-emerald-600 dark:text-emerald-400 font-medium px-2 py-0.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/15 transition-colors cursor-pointer';
+                dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-500';
+            } else if (state === 'syncing') {
+                badge.className = 'inline-flex items-center gap-1.5 text-[11px] text-indigo-600 dark:text-indigo-400 font-medium px-2 py-0.5 rounded-lg bg-indigo-500/10 transition-colors cursor-pointer';
+                dot.className = 'w-1.5 h-1.5 rounded-full bg-indigo-500 animate-ping';
+            } else {
+                badge.className = 'inline-flex items-center gap-1.5 text-[11px] text-amber-600 dark:text-amber-400 font-medium px-2 py-0.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/15 transition-colors cursor-pointer';
+                dot.className = 'w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse';
+            }
+        }
+
+        async function persistNoteToCloud(note) {
+            if (!db || !currentUser || !note) return;
+            try {
+                updateCloudStatus('syncing', 'Đang đồng bộ...');
+                const safeWs = workspaceId.replace(/[^a-zA-Z0-9_-]/g, '_');
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', `notes_${safeWs}`, note.id), { ...note });
+                updateCloudStatus('connected', 'Đã đồng bộ');
+            } catch (e) {
+                console.error('Lỗi lưu ghi chú lên đám mây:', e);
+                updateCloudStatus('error', 'Lỗi đồng bộ');
+            }
+        }
+
+        async function removeNoteFromCloud(noteId) {
+            if (!db || !currentUser || !noteId) return;
+            try {
+                const safeWs = workspaceId.replace(/[^a-zA-Z0-9_-]/g, '_');
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', `notes_${safeWs}`, noteId));
+            } catch (e) {
+                console.error('Lỗi xóa ghi chú trên đám mây:', e);
+            }
+        }
+
+        async function persistLabelToCloud(lbl, orderIdx = 0) {
+            if (!db || !currentUser || !lbl) return;
+            try {
+                const safeWs = workspaceId.replace(/[^a-zA-Z0-9_-]/g, '_');
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', `labels_${safeWs}`, lbl.id), {
+                    ...lbl,
+                    order: orderIdx
+                });
+            } catch (e) {
+                console.error('Lỗi lưu nhãn lên đám mây:', e);
+            }
+        }
+
+        async function removeLabelFromCloud(labelId) {
+            if (!db || !currentUser || !labelId) return;
+            try {
+                const safeWs = workspaceId.replace(/[^a-zA-Z0-9_-]/g, '_');
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', `labels_${safeWs}`, labelId));
+            } catch (e) {
+                console.error('Lỗi xóa nhãn trên đám mây:', e);
+            }
+        }
+
+        function openCloudSettingsModal() {
+            const modal = document.getElementById('cloud-settings-modal');
+            const wsInput = document.getElementById('cloud-workspace-input');
+            if (wsInput) wsInput.value = workspaceId;
+            if (modal) modal.classList.add('modal-open');
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function closeCloudSettingsModal() {
+            document.getElementById('cloud-settings-modal')?.classList.remove('modal-open');
+        }
+
+        function copyWorkspaceId() {
+            const wsInput = document.getElementById('cloud-workspace-input');
+            if (!wsInput) return;
+            wsInput.select();
+            document.execCommand('copy');
+            const fb = document.getElementById('cloud-config-feedback');
+            if (fb) {
+                fb.textContent = 'Đã sao chép Mã đồng bộ vào khay nhớ tạm!';
+                fb.className = 'text-[11px] font-medium text-emerald-600 dark:text-emerald-400';
+                fb.classList.remove('hidden');
+            }
+        }
+
+        function applyWorkspaceId() {
+            const wsInput = document.getElementById('cloud-workspace-input');
+            const val = wsInput?.value.trim();
+            if (!val) return;
+            workspaceId = val;
+            activeNoteId = null;
+            if (isCloudReady) {
+                updateCloudStatus('syncing', 'Đang chuyển không gian...');
+                startRealtimeListeners();
+            }
+            closeCloudSettingsModal();
+        }
+
+        async function saveCustomCloudConfig() {
+            const textarea = document.getElementById('cloud-custom-config-input');
+            const fb = document.getElementById('cloud-config-feedback');
+            if (!textarea || !fb) return;
+
+            try {
+                const parsed = JSON.parse(textarea.value.trim());
+                if (!parsed.apiKey || !parsed.projectId) {
+                    throw new Error('Thiếu apiKey hoặc projectId');
+                }
+                window.__CUSTOM_CLOUD_CONFIG__ = parsed;
+                fb.textContent = 'Cấu hình hợp lệ! Đang kết nối máy chủ đám mây...';
+                fb.className = 'text-[11px] font-medium text-emerald-600 dark:text-emerald-400';
+                fb.classList.remove('hidden');
+                await initCloudSync();
+            } catch (e) {
+                fb.textContent = 'Cấu hình JSON không hợp lệ. Vui lòng kiểm tra lại.';
+                fb.className = 'text-[11px] font-medium text-rose-600 dark:text-rose-400';
+                fb.classList.remove('hidden');
+            }
+        }
+
+        // ==================== GIAO DIỆN SÁNG/TỐI & CÀI ĐẶT HIỂN THỊ ====================
+        let themeTransitionTimer = null;
+
+        function loadTheme() {
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            document.documentElement.classList.toggle('dark', prefersDark);
+            updateThemeIcon(prefersDark, false);
+        }
+
+        function toggleTheme() {
+            const root = document.documentElement;
+            const isDark = !root.classList.contains('dark');
+
+            root.classList.add('theme-transitioning');
+            clearTimeout(themeTransitionTimer);
+            themeTransitionTimer = setTimeout(() => {
+                root.classList.remove('theme-transitioning');
+            }, 460);
+
+            root.classList.toggle('dark', isDark);
+            updateThemeIcon(isDark, true);
+            renderBgControls();
+
+            const currentNote = notes.find(n => n.id === activeNoteId);
+            if (currentNote) {
+                applyBackgroundToEditor(
+                    currentNote.bgColor || 'default',
+                    currentNote.bgPattern || 'none',
+                    currentNote.bgImage || '',
+                    currentNote.bgImageOpacity || 35
+                );
+            }
+        }
+
+        function updateThemeIcon(isDark, animate = false) {
+            const wrapper = document.getElementById('theme-icon-wrapper');
+            const btn = document.getElementById('theme-toggle-btn');
+            if (btn) btn.setAttribute('aria-checked', String(isDark));
+            if (!wrapper) return;
+
+            if (isDark) {
+                wrapper.innerHTML = `
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19.8 14.5C18.5 15.1 17 15.4 15.4 15.4C10.2 15.4 6 11.2 6 6C6 4.4 6.4 2.9 7.1 1.6C3.9 3 1.7 6.2 1.7 10C1.7 15.1 5.8 19.3 11 19.3C14.8 19.3 18.1 17.2 19.8 14.5Z" fill="#4338ca"/>
+                        <path d="M15.5 3.5L16.1 5.1L17.7 5.7L16.1 6.3L15.5 7.9L14.9 6.3L13.3 5.7L14.9 5.1L15.5 3.5Z" fill="#4f46e5"/>
+                        <path d="M19.2 8.2L19.6 9.2L20.6 9.6L19.6 10L19.2 11L18.8 10L17.8 9.6L18.8 9.2L19.2 8.2Z" fill="#4f46e5"/>
+                        <circle cx="13" cy="10.2" r="0.9" fill="#4f46e5"/>
+                    </svg>
+                `;
+            } else {
+                wrapper.innerHTML = `
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="5" fill="#0ea5e9"/>
+                        <path d="M12 2.5V4.5M12 19.5V21.5M4.5 12H2.5M21.5 12H19.5M5.6 5.6L7 7M17 17L18.4 18.4M18.4 5.6L17 7M7 17L5.6 18.4" stroke="#0284c7" stroke-width="2.2" stroke-linecap="round"/>
+                    </svg>
+                `;
+            }
+
+            if (animate) {
+                wrapper.classList.remove('theme-icon-animate');
+                void wrapper.offsetWidth;
+                wrapper.classList.add('theme-icon-animate');
+            }
+        }
+
+        function loadDefaultFont() {
+            defaultFont = 'inter';
+        }
+
+        function loadListCollapseState() {
+            isNoteListCollapsed = false;
+            applyListCollapseUI();
+        }
+
+        function toggleNoteListCollapse(forceState) {
+            isNoteListCollapsed = typeof forceState === 'boolean' ? forceState : !isNoteListCollapsed;
+            applyListCollapseUI();
+        }
+
+        function applyListCollapseUI() {
+            const panel = document.getElementById('note-list-panel');
+            const expandBtn = document.getElementById('expand-list-btn');
+            const emptyExpandBtn = document.getElementById('empty-expand-list-btn');
+
+            if (panel) {
+                panel.classList.toggle('list-collapsed', isNoteListCollapsed);
+            }
+            if (expandBtn) {
+                expandBtn.classList.toggle('hidden', !isNoteListCollapsed);
+                expandBtn.classList.toggle('inline-flex', isNoteListCollapsed);
+            }
+            if (emptyExpandBtn) {
+                emptyExpandBtn.classList.toggle('hidden', !isNoteListCollapsed);
+                emptyExpandBtn.classList.toggle('inline-flex', isNoteListCollapsed);
+            }
+        }
+
+        function getLabelInfo(labelId) {
+            const found = labels.find(l => l.id === labelId) || labels[0] || DEFAULT_LABELS[0];
+            const iconMeta = LABEL_ICON_CHOICES.find(i => i.icon === found.icon) || LABEL_ICON_CHOICES[11];
+            return {
+                id: found.id,
+                name: found.name,
+                icon: found.icon || 'folder',
+                colorClass: iconMeta.color,
+                badgeClass: iconMeta.badgeBg
+            };
+        }
+
+        // ==================== LỌC, TÌM KIẾM & RENDER GIAO DIỆN ====================
+        function setFilter(filterKey) {
+            currentFilter = filterKey;
+            popFilterKey = filterKey;
+
+            // Tự động mở cột danh sách nếu đang thu gọn
+            if (isNoteListCollapsed) {
+                toggleNoteListCollapse(false);
+            }
+
+            toggleMobileSidebar(false);
+            renderAll();
+        }
+
+        function handleSearch(val) {
+            searchQuery = val.trim().toLowerCase();
+            const clearBtn = document.getElementById('clear-search-btn');
+            if (clearBtn) clearBtn.classList.toggle('hidden', !searchQuery);
             renderNoteList();
-          } else {
-            await setDoc(ref, { notes: state.notes, updatedAt: Date.now() }, { merge: true });
-          }
-          setCloudStatus('connected', 'Đã đồng bộ');
-        } catch (e) {
-          console.error(e);
-          setCloudStatus('error', 'Lỗi kết nối');
         }
-      }, (err) => {
-        console.error(err);
-        setCloudStatus('error', 'Lỗi kết nối');
-      });
-    }
 
-    function initFirebase() {
-      try {
-        const app = initializeApp(FIREBASE_CONFIG);
-        auth = getAuth(app);
-        db = getFirestore(app);
+        function clearSearch() {
+            const input = document.getElementById('search-input');
+            if (input) input.value = '';
+            handleSearch('');
+        }
 
-        onAuthStateChanged(auth, (user) => {
-          if (user) {
-            subscribeWorkspace(state.workspaceId);
-          } else {
-            setCloudStatus('syncing', 'Đang xác thực...');
-          }
+        function getFilteredNotes() {
+            return notes
+                .filter(note => {
+                    if (currentFilter === 'trash') return note.trashed;
+                    if (note.trashed) return false;
+                    if (currentFilter === 'pinned') return note.pinned;
+                    if (currentFilter !== 'all') return note.label === currentFilter;
+                    return true;
+                })
+                .filter(note => {
+                    if (!searchQuery) return true;
+                    const plainContent = stripHtml(note.content || '').toLowerCase();
+                    const title = (note.title || '').toLowerCase();
+                    return title.includes(searchQuery) || plainContent.includes(searchQuery);
+                })
+                .sort((a, b) => {
+                    if (currentFilter !== 'trash' && a.pinned !== b.pinned) {
+                        return b.pinned ? 1 : -1;
+                    }
+                    return b.updatedAt - a.updatedAt;
+                });
+        }
+
+        function renderAll() {
+            renderSidebarNavigation();
+            renderNoteList();
+            renderEditorLabelPills();
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function renderSidebarNavigation() {
+            const activeNotes = notes.filter(n => !n.trashed);
+            const pinnedCount = activeNotes.filter(n => n.pinned).length;
+            const trashCount = notes.filter(n => n.trashed).length;
+
+            document.getElementById('count-all').textContent = activeNotes.length;
+            document.getElementById('count-pinned').textContent = pinnedCount;
+            document.getElementById('count-trash').textContent = trashCount;
+
+            // Cập nhật trạng thái active cho các mục hệ thống
+            document.querySelectorAll('.nav-item[data-filter]').forEach(btn => {
+                const key = btn.getAttribute('data-filter');
+                if (!['all', 'pinned', 'trash'].includes(key)) return;
+                const isActive = currentFilter === key;
+                btn.className = `nav-item w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium transition-all cursor-pointer ${
+                    isActive
+                        ? 'bg-indigo-600/12 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-300 font-semibold'
+                        : 'text-gray-600 dark:text-zinc-400 hover:bg-black/5 dark:hover:bg-white/5'
+                } ${isActive && popFilterKey === key ? 'folder-pop' : ''}`;
+            });
+
+            // Render danh sách nhãn tùy chỉnh
+            const labelsContainer = document.getElementById('sidebar-labels-list');
+            if (!labelsContainer) return;
+
+            labelsContainer.innerHTML = labels.map(lbl => {
+                const info = getLabelInfo(lbl.id);
+                const count = activeNotes.filter(n => n.label === lbl.id).length;
+                const isActive = currentFilter === lbl.id;
+                const shouldPop = isActive && popFilterKey === lbl.id;
+
+                return `
+                    <div data-sidebar-label-id="${lbl.id}" class="group relative flex items-center">
+                        <button onclick="setFilter('${lbl.id}')" data-filter="${lbl.id}" class="nav-item w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium transition-all cursor-pointer ${
+                            isActive
+                                ? 'bg-indigo-600/12 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-300 font-semibold'
+                                : 'text-gray-600 dark:text-zinc-400 hover:bg-black/5 dark:hover:bg-white/5'
+                        } ${shouldPop ? 'folder-pop' : ''}">
+                            <span class="flex items-center gap-2.5 min-w-0 pr-6">
+                                ${renderSolidLabelIcon(info.icon, 'w-4 h-4', `${info.colorClass} transition-transform duration-200 ${isActive ? '-rotate-6 scale-110' : ''}`)}
+                                <span class="truncate">${escapeHtml(lbl.name)}</span>
+                            </span>
+                            <span class="text-xs font-medium text-gray-400 dark:text-zinc-500 group-hover:opacity-0 transition-opacity">${count}</span>
+                        </button>
+                        <button onclick="openLabelManagerModal('${lbl.id}', this); event.stopPropagation();" title="Sửa nhãn" class="opacity-0 group-hover:opacity-100 absolute right-2 p-1 rounded-lg text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-300 hover:bg-white/80 dark:hover:bg-zinc-800 transition-all cursor-pointer">
+                            <i data-lucide="pencil" class="w-3 h-3"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            popFilterKey = null;
+        }
+
+        function renderNoteList() {
+            const filtered = getFilteredNotes();
+            const container = document.getElementById('notes-container');
+            const titleEl = document.getElementById('current-folder-title');
+            const subtitleEl = document.getElementById('current-folder-subtitle');
+
+            let folderName = 'Tất cả ghi chú';
+            if (currentFilter === 'pinned') folderName = 'Đã ghim';
+            else if (currentFilter === 'trash') folderName = 'Thùng rác';
+            else if (currentFilter !== 'all') {
+                folderName = getLabelInfo(currentFilter).name;
+            }
+
+            if (titleEl) {
+                titleEl.textContent = folderName;
+                titleEl.classList.remove('title-slide-in');
+                void titleEl.offsetWidth;
+                titleEl.classList.add('title-slide-in');
+            }
+            if (subtitleEl) {
+                subtitleEl.textContent = `${filtered.length} ghi chú`;
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="py-12 px-4 text-center">
+                        <div class="w-11 h-11 rounded-2xl bg-gray-100 dark:bg-zinc-800/80 text-gray-400 flex items-center justify-center mx-auto mb-2.5">
+                            <i data-lucide="file-search" class="w-5 h-5"></i>
+                        </div>
+                        <p class="text-xs font-medium text-gray-500 dark:text-zinc-400">Không có ghi chú nào</p>
+                    </div>
+                `;
+                if (window.lucide) lucide.createIcons();
+                return;
+            }
+
+            container.innerHTML = filtered.map((note, idx) => {
+                const isSelected = note.id === activeNoteId;
+                const info = getLabelInfo(note.label);
+                const plainText = stripHtml(note.content || '').trim() || 'Chưa có nội dung bổ sung...';
+                const delay = Math.min(idx * 32, 260);
+
+                return `
+                    <div onclick="selectNote('${note.id}')" style="animation-delay: ${delay}ms" class="note-card-enter p-3 rounded-xl cursor-pointer transition-all border ${
+                        isSelected
+                            ? 'bg-white dark:bg-zinc-800/95 border-indigo-500/50 shadow-sm ring-1 ring-indigo-500/20'
+                            : 'bg-white/60 dark:bg-zinc-900/40 border-transparent hover:bg-white dark:hover:bg-zinc-800/70 hover:border-gray-200/70 dark:hover:border-zinc-700/70'
+                    }">
+                        <div class="flex items-start justify-between gap-2 mb-1">
+                            <h3 class="text-sm font-semibold text-gray-900 dark:text-zinc-100 truncate">${escapeHtml(note.title || 'Ghi chú không tiêu đề')}</h3>
+                            ${note.pinned ? '<i data-lucide="pin" class="w-3.5 h-3.5 text-amber-500 flex-shrink-0 mt-0.5"></i>' : ''}
+                        </div>
+                        <p class="text-xs text-gray-500 dark:text-zinc-400 line-clamp-1 mb-2">${escapeHtml(plainText)}</p>
+                        <div class="flex items-center justify-between text-[11px]">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md font-medium ${info.badgeClass}">
+                                ${renderSolidLabelIcon(info.icon, 'w-3 h-3')}
+                                <span>${escapeHtml(info.name)}</span>
+                            </span>
+                            <span class="text-gray-400 dark:text-zinc-500">${formatRelativeTime(note.updatedAt)}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        // ==================== TẠO, CHỌN, CẬP NHẬT & XÓA GHI CHÚ ====================
+        function createNewNote() {
+            const targetLabel = !['all', 'pinned', 'trash'].includes(currentFilter)
+                ? currentFilter
+                : (labels[0]?.id || 'work');
+
+            if (currentFilter === 'trash') {
+                currentFilter = 'all';
+            }
+
+            const newNote = {
+                id: 'note-' + Date.now(),
+                title: '',
+                content: '',
+                label: targetLabel,
+                font: defaultFont,
+                bgColor: 'default',
+                bgPattern: 'none',
+                bgImage: '',
+                bgImageOpacity: 35,
+                pinned: false,
+                trashed: false,
+                updatedAt: Date.now()
+            };
+
+            notes.unshift(newNote);
+            activeNoteId = newNote.id;
+            renderAll();
+            selectNote(newNote.id, true);
+            persistNoteToCloud(newNote);
+
+            const titleInput = document.getElementById('note-title-input');
+            if (titleInput) titleInput.focus();
+        }
+
+        function selectNote(noteId, animateTransition = true) {
+            const note = notes.find(n => n.id === noteId);
+            if (!note) return;
+
+            activeNoteId = note.id;
+
+            // Trên màn hình nhỏ dưới 768px, tự thu gọn danh sách khi bấm vào ghi chú để mở trình soạn thảo
+            if (window.innerWidth < 768 && !isNoteListCollapsed) {
+                toggleNoteListCollapse(true);
+            }
+
+            document.getElementById('empty-editor-state').classList.add('hidden');
+            const wrapper = document.getElementById('active-editor-wrapper');
+            wrapper.classList.remove('hidden');
+
+            if (animateTransition) {
+                wrapper.classList.remove('editor-transition');
+                void wrapper.offsetWidth;
+                wrapper.classList.add('editor-transition');
+            }
+
+            document.getElementById('note-title-input').value = note.title || '';
+            document.getElementById('editor-content').innerHTML = note.content || '';
+
+            // Khóa chỉnh sửa nếu ghi chú đang trong Thùng rác
+            const isTrashed = Boolean(note.trashed);
+            document.getElementById('note-title-input').disabled = isTrashed;
+            document.getElementById('editor-content').contentEditable = isTrashed ? 'false' : 'true';
+            document.getElementById('formatting-toolbar').classList.toggle('hidden', isTrashed);
+
+            const restoreBtn = document.getElementById('restore-note-btn');
+            restoreBtn.classList.toggle('hidden', !isTrashed);
+            restoreBtn.classList.toggle('inline-flex', isTrashed);
+
+            applyFontToEditor(note.font || 'inter');
+            applyBackgroundToEditor(
+                note.bgColor || 'default',
+                note.bgPattern || 'none',
+                note.bgImage || '',
+                note.bgImageOpacity || 35
+            );
+            renderBgControls();
+            renderEditorLabelPills();
+            updateEditorMetadata(note);
+            renderNoteList();
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function showEmptyEditorState() {
+            activeNoteId = null;
+            document.getElementById('active-editor-wrapper').classList.add('hidden');
+            document.getElementById('empty-editor-state').classList.remove('hidden');
+            applyListCollapseUI();
+        }
+
+        function handleEditorInput() {
+            const note = notes.find(n => n.id === activeNoteId);
+            if (!note || note.trashed) return;
+
+            note.title = document.getElementById('note-title-input').value;
+            note.content = document.getElementById('editor-content').innerHTML;
+            note.updatedAt = Date.now();
+
+            updateEditorMetadata(note);
+
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => {
+                renderNoteList();
+                persistNoteToCloud(note);
+            }, 400);
+        }
+
+        function updateEditorMetadata(note) {
+            const date = new Date(note.updatedAt);
+            const timeStr = date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+            const dateStr = date.toLocaleDateString('vi-VN');
+            document.getElementById('note-updated-at').textContent = `Cập nhật lúc ${timeStr} - ${dateStr}`;
+
+            const plainText = stripHtml(note.content || '').trim();
+            const words = plainText ? plainText.split(/\s+/).length : 0;
+            const chars = plainText.length;
+            document.getElementById('note-word-count').textContent = `${words} từ, ${chars} ký tự`;
+        }
+
+        function renderEditorLabelPills() {
+            const container = document.getElementById('editor-label-pills');
+            if (!container) return;
+            const currentNote = notes.find(n => n.id === activeNoteId);
+
+            container.innerHTML = labels.map(lbl => {
+                const info = getLabelInfo(lbl.id);
+                const isSelected = currentNote && currentNote.label === lbl.id;
+
+                return `
+                    <button onclick="updateNoteLabel('${lbl.id}')" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                        isSelected
+                            ? 'bg-white dark:bg-zinc-800 text-gray-900 dark:text-white shadow-xs'
+                            : 'text-gray-500 dark:text-zinc-400 hover:text-gray-800 dark:hover:text-zinc-200'
+                    }">
+                        ${renderSolidLabelIcon(info.icon, 'w-3.5 h-3.5', info.colorClass)}
+                        <span>${escapeHtml(lbl.name)}</span>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function updateNoteLabel(labelId) {
+            const note = notes.find(n => n.id === activeNoteId);
+            if (!note || note.trashed) return;
+            note.label = labelId;
+            note.updatedAt = Date.now();
+            persistNoteToCloud(note);
+            renderAll();
+        }
+
+        function togglePinCurrentNote() {
+            const note = notes.find(n => n.id === activeNoteId);
+            if (!note || note.trashed) return;
+            note.pinned = !note.pinned;
+            persistNoteToCloud(note);
+            selectNote(note.id, false);
+            renderAll();
+        }
+
+        function deleteCurrentNote() {
+            const note = notes.find(n => n.id === activeNoteId);
+            if (!note) return;
+
+            if (!note.trashed) {
+                note.trashed = true;
+                note.pinned = false;
+                persistNoteToCloud(note);
+                selectNextAvailableNote();
+                renderAll();
+            } else {
+                openConfirmModal(() => {
+                    const targetId = note.id;
+                    notes = notes.filter(n => n.id !== targetId);
+                    removeNoteFromCloud(targetId);
+                    selectNextAvailableNote();
+                    renderAll();
+                });
+            }
+        }
+
+        function restoreCurrentNote() {
+            const note = notes.find(n => n.id === activeNoteId);
+            if (!note) return;
+            note.trashed = false;
+            note.updatedAt = Date.now();
+            persistNoteToCloud(note);
+            selectNextAvailableNote();
+            renderAll();
+        }
+
+        function selectNextAvailableNote() {
+            const list = getFilteredNotes();
+            if (list.length > 0) {
+                selectNote(list[0].id, true);
+            } else {
+                showEmptyEditorState();
+            }
+        }
+
+        // ==================== QUẢN LÝ NHÃN PHÂN LOẠI & HIỆU ỨNG MACOS ====================
+        function openLabelManagerModal(labelId = null, triggerEl = null) {
+            const modal = document.getElementById('label-manager-modal');
+            const card = document.getElementById('label-manager-card');
+
+            if (triggerEl && card) {
+                const rect = triggerEl.getBoundingClientRect();
+                const originX = rect.left + rect.width / 2;
+                const originY = rect.top + rect.height / 2;
+                card.style.transformOrigin = `${originX}px ${originY}px`;
+            } else if (card) {
+                card.style.transformOrigin = 'center center';
+            }
+
+            if (labelId) {
+                const lbl = labels.find(l => l.id === labelId);
+                if (lbl) {
+                    editingLabelId = lbl.id;
+                    selectedLabelIcon = lbl.icon || 'folder';
+                    document.getElementById('label-modal-title').textContent = 'Sửa thư mục';
+                    document.getElementById('label-name-input').value = lbl.name;
+                    document.getElementById('save-label-btn-text').textContent = 'Lưu thay đổi';
+                    document.getElementById('cancel-edit-label-btn').textContent = 'Hủy sửa';
+                }
+            } else {
+                resetLabelForm();
+            }
+
+            renderLabelIconPicker();
+            renderManageLabelsList();
+            modal.classList.add('modal-open');
+            if (window.lucide) lucide.createIcons();
+            setTimeout(() => document.getElementById('label-name-input')?.focus(), 120);
+        }
+
+        function closeLabelManagerModal() {
+            const modal = document.getElementById('label-manager-modal');
+            if (modal) modal.classList.remove('modal-open');
+        }
+
+        function handleCancelLabelModal() {
+            if (editingLabelId) {
+                resetLabelForm();
+                renderLabelIconPicker();
+            } else {
+                closeLabelManagerModal();
+            }
+        }
+
+        function resetLabelForm() {
+            editingLabelId = null;
+            selectedLabelIcon = 'folder';
+            const titleEl = document.getElementById('label-modal-title');
+            if (titleEl) titleEl.textContent = 'Thư mục mới';
+            const input = document.getElementById('label-name-input');
+            if (input) input.value = '';
+            document.getElementById('save-label-btn-text').textContent = 'Tạo thư mục';
+            document.getElementById('cancel-edit-label-btn').textContent = 'Hủy';
+            updateLabelPreviewBadge();
+        }
+
+        function updateLabelPreviewBadge() {
+            const badge = document.getElementById('label-preview-icon-badge');
+            if (!badge) return;
+            const iconMeta = LABEL_ICON_CHOICES.find(i => i.icon === selectedLabelIcon) || LABEL_ICON_CHOICES[11];
+            badge.className = `absolute left-2.5 w-7 h-7 rounded-lg flex items-center justify-center pointer-events-none transition-colors ${iconMeta.badgeBg}`;
+            badge.innerHTML = renderSolidLabelIcon(iconMeta.icon, 'w-4 h-4');
+        }
+
+        function renderLabelIconPicker() {
+            const container = document.getElementById('label-icon-picker');
+            if (!container) return;
+
+            container.innerHTML = LABEL_ICON_CHOICES.map(item => {
+                const isSelected = selectedLabelIcon === item.icon;
+                return `
+                    <button type="button" onclick="selectLabelIconChoice('${item.icon}')" title="${item.title}" class="h-9 rounded-xl flex items-center justify-center border transition-all cursor-pointer ${
+                        isSelected
+                            ? 'bg-indigo-50 dark:bg-indigo-500/20 border-indigo-500 scale-105 shadow-xs'
+                            : 'bg-white dark:bg-zinc-900 border-gray-200/80 dark:border-zinc-700 hover:border-indigo-300'
+                    }">
+                        ${renderSolidLabelIcon(item.icon, 'w-4 h-4', item.color)}
+                    </button>
+                `;
+            }).join('');
+            updateLabelPreviewBadge();
+        }
+
+        function selectLabelIconChoice(iconName) {
+            selectedLabelIcon = iconName;
+            renderLabelIconPicker();
+        }
+
+        function saveCustomLabel() {
+            const input = document.getElementById('label-name-input');
+            const name = input.value.trim();
+            if (!name) {
+                input.focus();
+                return;
+            }
+
+            if (editingLabelId) {
+                const target = labels.find(l => l.id === editingLabelId);
+                if (target) {
+                    target.name = name;
+                    target.icon = selectedLabelIcon;
+                    const idx = labels.findIndex(l => l.id === editingLabelId);
+                    persistLabelToCloud(target, idx);
+                }
+                resetLabelForm();
+                renderManageLabelsList();
+                renderAll();
+            } else {
+                const newLabel = {
+                    id: 'lbl-' + Date.now(),
+                    name,
+                    icon: selectedLabelIcon
+                };
+                labels.push(newLabel);
+                persistLabelToCloud(newLabel, labels.length - 1);
+                renderAll();
+                closeLabelManagerModal();
+            }
+        }
+
+        function renderManageLabelsList() {
+            const container = document.getElementById('manage-labels-list');
+            if (!container) return;
+
+            container.innerHTML = labels.map(lbl => {
+                const info = getLabelInfo(lbl.id);
+                const canDelete = labels.length > 1;
+                return `
+                    <div data-manage-label-id="${lbl.id}" class="flex items-center justify-between px-2.5 py-1.5 rounded-xl bg-gray-100/70 dark:bg-zinc-800/70 border border-gray-200/50 dark:border-zinc-700/50">
+                        <span class="flex items-center gap-2 text-xs font-medium text-gray-800 dark:text-zinc-200 min-w-0">
+                            ${renderSolidLabelIcon(info.icon, 'w-3.5 h-3.5', info.colorClass)}
+                            <span class="truncate">${escapeHtml(lbl.name)}</span>
+                        </span>
+                        <div class="flex items-center gap-1 flex-shrink-0">
+                            <button type="button" onclick="editCustomLabel('${lbl.id}')" title="Sửa thư mục" class="p-1 rounded-lg text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-zinc-700 transition-colors cursor-pointer">
+                                <i data-lucide="pencil" class="w-3 h-3"></i>
+                            </button>
+                            ${canDelete ? `
+                                <button type="button" onclick="deleteCustomLabel('${lbl.id}')" title="Xóa thư mục" class="p-1 rounded-lg text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-white dark:hover:bg-zinc-700 transition-colors cursor-pointer">
+                                    <i data-lucide="trash-2" class="w-3 h-3"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function editCustomLabel(labelId) {
+            const lbl = labels.find(l => l.id === labelId);
+            if (!lbl) return;
+            editingLabelId = lbl.id;
+            selectedLabelIcon = lbl.icon || 'folder';
+            document.getElementById('label-modal-title').textContent = 'Sửa thư mục';
+            document.getElementById('label-name-input').value = lbl.name;
+            document.getElementById('save-label-btn-text').textContent = 'Lưu thay đổi';
+            document.getElementById('cancel-edit-label-btn').textContent = 'Hủy sửa';
+            renderLabelIconPicker();
+            document.getElementById('label-name-input').focus();
+        }
+
+        function deleteCustomLabel(labelId) {
+            if (labels.length <= 1) return;
+
+            const manageRow = document.querySelector(`[data-manage-label-id="${labelId}"]`);
+            const sidebarRow = document.querySelector(`[data-sidebar-label-id="${labelId}"]`);
+            if (manageRow) manageRow.classList.add('label-row-exit');
+            if (sidebarRow) sidebarRow.classList.add('label-row-exit');
+
+            setTimeout(() => {
+                const fallbackId = labels.find(l => l.id !== labelId)?.id || 'work';
+                labels = labels.filter(l => l.id !== labelId);
+                removeLabelFromCloud(labelId);
+
+                notes.forEach(n => {
+                    if (n.label === labelId) {
+                        n.label = fallbackId;
+                        persistNoteToCloud(n);
+                    }
+                });
+
+                if (currentFilter === labelId) currentFilter = 'all';
+                if (editingLabelId === labelId) resetLabelForm();
+
+                renderManageLabelsList();
+                renderAll();
+            }, 280);
+        }
+
+        // ==================== CHỌN PHÔNG CHỮ & BẢNG ĐIỀU KHIỂN HÌNH NỀN ====================
+        function renderFontOptions() {
+            const container = document.getElementById('font-options-list');
+            if (!container) return;
+            const currentNote = notes.find(n => n.id === activeNoteId);
+            const activeFontKey = currentNote ? (currentNote.font || 'inter') : defaultFont;
+
+            container.innerHTML = Object.entries(FONT_CONFIG).map(([key, cfg]) => {
+                const isSelected = activeFontKey === key;
+                return `
+                    <button type="button" onclick="selectNoteFont('${key}')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left transition-all cursor-pointer ${
+                        isSelected
+                            ? 'bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300'
+                            : 'hover:bg-gray-100/80 dark:hover:bg-zinc-800/80 text-gray-700 dark:text-zinc-200'
+                    }">
+                        <div>
+                            <div style="font-family: ${cfg.css}" class="text-sm font-semibold">${cfg.label}</div>
+                            <div class="text-[11px] text-gray-400 dark:text-zinc-500">${cfg.desc}</div>
+                        </div>
+                        ${isSelected ? '<i data-lucide="check" class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></i>' : ''}
+                    </button>
+                `;
+            }).join('');
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function selectNoteFont(fontKey) {
+            if (!FONT_CONFIG[fontKey]) return;
+            defaultFont = fontKey;
+
+            const note = notes.find(n => n.id === activeNoteId);
+            if (note && !note.trashed) {
+                note.font = fontKey;
+                persistNoteToCloud(note);
+            }
+
+            applyFontToEditor(fontKey);
+            renderFontOptions();
+            closeAllPopovers();
+        }
+
+        function applyFontToEditor(fontKey) {
+            const cfg = FONT_CONFIG[fontKey] || FONT_CONFIG.inter;
+            document.documentElement.style.setProperty('--editor-font', cfg.css);
+            const labelEl = document.getElementById('current-font-label');
+            if (labelEl) labelEl.textContent = cfg.label;
+            renderFontOptions();
+        }
+
+        function renderBgControls() {
+            const currentNote = notes.find(n => n.id === activeNoteId);
+            const activeColor = currentNote?.bgColor || 'default';
+            const activePattern = currentNote?.bgPattern || 'none';
+            const activeImage = currentNote?.bgImage || '';
+            const activeOpacity = currentNote?.bgImageOpacity || 35;
+            const isDark = document.documentElement.classList.contains('dark');
+
+            const presetsGrid = document.getElementById('bg-image-presets-grid');
+            if (presetsGrid) {
+                presetsGrid.innerHTML = BG_IMAGE_PRESETS.map(preset => {
+                    const isSelected = activeImage === preset.url;
+                    return `
+                        <button type="button" onclick="selectNoteBgImage('${preset.url}')" class="group relative h-14 rounded-xl overflow-hidden border transition-all cursor-pointer ${
+                            isSelected
+                                ? 'border-indigo-500 ring-2 ring-indigo-500/30 scale-[1.02]'
+                                : 'border-gray-200/80 dark:border-zinc-700 hover:border-indigo-400'
+                        }">
+                            <img src="${preset.url}" alt="${preset.label}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                            <span class="absolute inset-x-0 bottom-0 bg-black/50 backdrop-blur-xs text-[10px] text-white font-medium py-0.5 px-1 truncate">${preset.label}</span>
+                        </button>
+                    `;
+                }).join('');
+            }
+
+            const slider = document.getElementById('bg-opacity-slider');
+            const valLabel = document.getElementById('bg-opacity-value');
+            if (slider) slider.value = activeOpacity;
+            if (valLabel) valLabel.textContent = `${activeOpacity}%`;
+
+            const swatchesEl = document.getElementById('bg-color-swatches');
+            const colorActiveLabel = document.getElementById('bg-color-active-label');
+            if (colorActiveLabel) {
+                colorActiveLabel.textContent = (BG_COLOR_CONFIG[activeColor] || BG_COLOR_CONFIG.default).label;
+            }
+            if (swatchesEl) {
+                swatchesEl.innerHTML = Object.entries(BG_COLOR_CONFIG).map(([key, cfg]) => {
+                    const isSelected = activeColor === key;
+                    const bgHex = isDark ? cfg.darkSwatch : cfg.swatch;
+                    return `
+                        <button type="button" onclick="selectNoteBgColor('${key}')" title="${cfg.label}" style="background-color: ${bgHex}" class="h-7 w-full rounded-xl border flex items-center justify-center transition-all cursor-pointer ${
+                            isSelected
+                                ? 'border-indigo-500 ring-2 ring-indigo-500/30 scale-105'
+                                : 'border-gray-300/90 dark:border-zinc-700 hover:scale-105'
+                        }">
+                            ${isSelected ? '<i data-lucide="check" class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400"></i>' : ''}
+                        </button>
+                    `;
+                }).join('');
+            }
+
+            const patternsEl = document.getElementById('bg-pattern-options');
+            const patternActiveLabel = document.getElementById('bg-pattern-active-label');
+            if (patternActiveLabel) {
+                patternActiveLabel.textContent = (BG_PATTERN_CONFIG[activePattern] || BG_PATTERN_CONFIG.none).label;
+            }
+            if (patternsEl) {
+                const patternPreviewStyles = {
+                    none: 'background: transparent;',
+                    dots: 'background-image: radial-gradient(rgba(99, 102, 241, 0.45) 1.2px, transparent 1.2px); background-size: 7px 7px;',
+                    lines: 'background-image: linear-gradient(to bottom, rgba(99, 102, 241, 0.35) 1px, transparent 1px); background-size: 100% 7px;',
+                    grid: 'background-image: linear-gradient(to right, rgba(99, 102, 241, 0.28) 1px, transparent 1px), linear-gradient(to bottom, rgba(99, 102, 241, 0.28) 1px, transparent 1px); background-size: 8px 8px;'
+                };
+
+                patternsEl.innerHTML = Object.entries(BG_PATTERN_CONFIG).map(([key, cfg]) => {
+                    const isSelected = activePattern === key;
+                    return `
+                        <button type="button" onclick="selectNoteBgPattern('${key}')" class="group flex flex-col items-center gap-1 p-1.5 rounded-xl border transition-all cursor-pointer ${
+                            isSelected
+                                ? 'bg-indigo-50/90 dark:bg-indigo-500/20 border-indigo-500 text-indigo-700 dark:text-indigo-300 shadow-xs'
+                                : 'bg-gray-50/80 dark:bg-zinc-800/70 border-gray-200/80 dark:border-zinc-700/80 text-gray-600 dark:text-zinc-300 hover:border-indigo-300'
+                        }">
+                            <div style="${patternPreviewStyles[key] || ''}" class="w-full h-7 rounded-lg bg-white dark:bg-zinc-900 border border-gray-200/70 dark:border-zinc-700/70"></div>
+                            <span class="text-[10px] font-medium leading-tight truncate w-full text-center">${cfg.label}</span>
+                        </button>
+                    `;
+                }).join('');
+            }
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function selectNoteBgImage(url) {
+            const note = notes.find(n => n.id === activeNoteId);
+            if (!note || note.trashed) return;
+            note.bgImage = url;
+            note.bgImageOpacity = note.bgImageOpacity || 35;
+            persistNoteToCloud(note);
+            applyBackgroundToEditor(note.bgColor, note.bgPattern, note.bgImage, note.bgImageOpacity);
+            renderBgControls();
+        }
+
+        function applyCustomBgImageUrl() {
+            const input = document.getElementById('custom-bg-url-input');
+            const url = input.value.trim();
+            if (!url) return;
+            selectNoteBgImage(url);
+            input.value = '';
+        }
+
+        function clearNoteBgImage() {
+            const note = notes.find(n => n.id === activeNoteId);
+            if (!note || note.trashed) return;
+            note.bgImage = '';
+            persistNoteToCloud(note);
+            applyBackgroundToEditor(note.bgColor, note.bgPattern, '', 35);
+            renderBgControls();
+        }
+
+        function updateNoteBgImageOpacity(val) {
+            const num = parseInt(val, 10) || 35;
+            document.getElementById('bg-opacity-value').textContent = `${num}%`;
+            const note = notes.find(n => n.id === activeNoteId);
+            if (!note || note.trashed) return;
+            note.bgImageOpacity = num;
+            persistNoteToCloud(note);
+            applyBackgroundToEditor(note.bgColor, note.bgPattern, note.bgImage, num);
+        }
+
+        function selectNoteBgColor(colorKey) {
+            const note = notes.find(n => n.id === activeNoteId);
+            if (!note || note.trashed) return;
+            note.bgColor = colorKey;
+            persistNoteToCloud(note);
+            applyBackgroundToEditor(note.bgColor, note.bgPattern, note.bgImage, note.bgImageOpacity);
+            renderBgControls();
+        }
+
+        function selectNoteBgPattern(patternKey) {
+            const note = notes.find(n => n.id === activeNoteId);
+            if (!note || note.trashed) return;
+            note.bgPattern = patternKey;
+            persistNoteToCloud(note);
+            applyBackgroundToEditor(note.bgColor, note.bgPattern, note.bgImage, note.bgImageOpacity);
+            renderBgControls();
+        }
+
+        function applyBackgroundToEditor(colorKey, patternKey, imageUrl, opacityPercent) {
+            const panel = document.getElementById('editor-panel');
+            const imgLayer = document.getElementById('editor-bg-image-layer');
+            const tintLayer = document.getElementById('editor-bg-tint-layer');
+            const isDark = document.documentElement.classList.contains('dark');
+
+            Object.values(BG_COLOR_CONFIG).forEach(c => panel.classList.remove(c.className));
+            Object.values(BG_PATTERN_CONFIG).forEach(p => { if (p.className) panel.classList.remove(p.className); });
+
+            const toneCfg = BG_COLOR_CONFIG[colorKey] || BG_COLOR_CONFIG.default;
+            const patternCfg = BG_PATTERN_CONFIG[patternKey] || BG_PATTERN_CONFIG.none;
+            panel.classList.add(toneCfg.className);
+            if (patternCfg.className) panel.classList.add(patternCfg.className);
+
+            if (imageUrl) {
+                panel.classList.add('has-bg-image');
+                imgLayer.style.backgroundImage = `url('${imageUrl}')`;
+                imgLayer.style.opacity = '1';
+
+                const tintAlpha = Math.max(0.32, 1 - (opacityPercent / 100));
+                tintLayer.style.background = isDark
+                    ? `rgba(11, 13, 18, ${tintAlpha})`
+                    : `rgba(253, 251, 247, ${tintAlpha})`;
+                tintLayer.style.opacity = '1';
+            } else {
+                panel.classList.remove('has-bg-image');
+                imgLayer.style.opacity = '0';
+                tintLayer.style.opacity = '0';
+            }
+        }
+
+        // ==================== ĐỊNH DẠNG VĂN BẢN & BẢNG KIỂU MICROSOFT WORD ====================
+        function execFormat(command) {
+            document.getElementById('editor-content').focus();
+            document.execCommand(command, false, null);
+            handleEditorInput();
+        }
+
+        function toggleHeading() {
+            document.getElementById('editor-content').focus();
+            const block = document.queryCommandValue('formatBlock');
+            document.execCommand('formatBlock', false, block.toLowerCase() === 'h2' ? 'p' : 'h2');
+            handleEditorInput();
+        }
+
+        function insertTodoItem() {
+            const editor = document.getElementById('editor-content');
+            editor.focus();
+            const todoHtml = `<div class="todo-item"><input type="checkbox"><span class="todo-text">Việc cần làm mới</span></div><p><br></p>`;
+            document.execCommand('insertHTML', false, todoHtml);
+            handleEditorInput();
+        }
+
+        function renderTableGridPicker() {
+            const grid = document.getElementById('table-grid-picker');
+            if (!grid) return;
+            let cellsHtml = '';
+            for (let r = 1; r <= 8; r++) {
+                for (let c = 1; c <= 8; c++) {
+                    cellsHtml += `<button type="button" data-r="${r}" data-c="${c}" onmouseenter="highlightTableGrid(${r}, ${c})" onclick="insertWordTable(${r}, ${c})" class="table-grid-cell w-5 h-5 rounded-xs border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 transition-colors cursor-pointer"></button>`;
+                }
+            }
+            grid.innerHTML = cellsHtml;
+            highlightTableGrid(3, 3);
+        }
+
+        function highlightTableGrid(rows, cols) {
+            document.getElementById('table-grid-size-label').textContent = `${rows} × ${cols}`;
+            document.querySelectorAll('.table-grid-cell').forEach(cell => {
+                const r = parseInt(cell.getAttribute('data-r'), 10);
+                const c = parseInt(cell.getAttribute('data-c'), 10);
+                const active = r <= rows && c <= cols;
+                cell.classList.toggle('bg-indigo-500', active);
+                cell.classList.toggle('border-indigo-600', active);
+                cell.classList.toggle('bg-white', !active);
+                cell.classList.toggle('dark:bg-zinc-900', !active);
+            });
+        }
+
+        function insertWordTable(rows, cols) {
+            const includeHeader = document.getElementById('table-include-header')?.checked ?? true;
+            let html = '<div class="word-table-wrapper"><table class="word-table"><tbody>';
+
+            for (let r = 0; r < rows; r++) {
+                html += '<tr>';
+                for (let c = 0; c < cols; c++) {
+                    if (r === 0 && includeHeader) {
+                        html += `<th>Tiêu đề ${c + 1}</th>`;
+                    } else {
+                        html += '<td><br></td>';
+                    }
+                }
+                html += '</tr>';
+            }
+            html += '</tbody></table></div><p><br></p>';
+
+            const editor = document.getElementById('editor-content');
+            editor.focus();
+            document.execCommand('insertHTML', false, html);
+            closeAllPopovers();
+            handleEditorInput();
+        }
+
+        function tableAction(action) {
+            if (!activeTableCell) return;
+            const table = activeTableCell.closest('table');
+            const row = activeTableCell.parentElement;
+            if (!table || !row) return;
+
+            const rowIndex = row.rowIndex;
+            const colIndex = activeTableCell.cellIndex;
+            const colCount = row.cells.length;
+
+            if (action === 'addRowAbove' || action === 'addRowBelow') {
+                const targetIdx = action === 'addRowAbove' ? rowIndex : rowIndex + 1;
+                const newRow = table.insertRow(targetIdx);
+                for (let i = 0; i < colCount; i++) {
+                    const cell = newRow.insertCell(i);
+                    cell.innerHTML = '<br>';
+                }
+            } else if (action === 'addColLeft' || action === 'addColRight') {
+                const targetCol = action === 'addColLeft' ? colIndex : colIndex + 1;
+                Array.from(table.rows).forEach((r, rIdx) => {
+                    const isHeader = r.cells[0]?.tagName === 'TH' && rIdx === 0;
+                    const newCell = document.createElement(isHeader ? 'th' : 'td');
+                    newCell.innerHTML = isHeader ? 'Cột mới' : '<br>';
+                    if (targetCol >= r.cells.length) r.appendChild(newCell);
+                    else r.insertBefore(newCell, r.cells[targetCol]);
+                });
+            } else if (action === 'deleteRow') {
+                if (table.rows.length <= 1) {
+                    table.closest('.word-table-wrapper')?.remove() || table.remove();
+                    activeTableCell = null;
+                    document.getElementById('table-context-toolbar').classList.add('hidden');
+                } else {
+                    table.deleteRow(rowIndex);
+                }
+            } else if (action === 'deleteCol') {
+                if (colCount <= 1) {
+                    table.closest('.word-table-wrapper')?.remove() || table.remove();
+                    activeTableCell = null;
+                    document.getElementById('table-context-toolbar').classList.add('hidden');
+                } else {
+                    Array.from(table.rows).forEach(r => {
+                        if (r.cells[colIndex]) r.deleteCell(colIndex);
+                    });
+                }
+            } else if (action === 'deleteTable') {
+                table.closest('.word-table-wrapper')?.remove() || table.remove();
+                activeTableCell = null;
+                document.getElementById('table-context-toolbar').classList.add('hidden');
+            }
+
+            handleEditorInput();
+        }
+
+        function setupEditorEventListeners() {
+            const editor = document.getElementById('editor-content');
+
+            editor.addEventListener('input', handleEditorInput);
+
+            // Xử lý tick chọn Checkbox Todo trực tiếp
+            editor.addEventListener('change', (e) => {
+                if (e.target && e.target.type === 'checkbox') {
+                    const item = e.target.closest('.todo-item');
+                    if (e.target.checked) {
+                        e.target.setAttribute('checked', 'checked');
+                        if (item) item.classList.add('completed');
+                    } else {
+                        e.target.removeAttribute('checked');
+                        if (item) item.classList.remove('completed');
+                    }
+                    handleEditorInput();
+                }
+            });
+
+            // Theo dõi vị trí con trỏ trong Bảng Word để hiện thanh công cụ nổi
+            const updateTableContext = () => {
+                const sel = window.getSelection();
+                if (!sel || !sel.anchorNode) return;
+                const el = sel.anchorNode.nodeType === 3 ? sel.anchorNode.parentElement : sel.anchorNode;
+                const cell = el?.closest('td, th');
+                const toolbar = document.getElementById('table-context-toolbar');
+                if (cell && editor.contains(cell)) {
+                    activeTableCell = cell;
+                    toolbar.classList.remove('hidden');
+                } else {
+                    activeTableCell = null;
+                    toolbar.classList.add('hidden');
+                }
+            };
+
+            editor.addEventListener('click', updateTableContext);
+            editor.addEventListener('keyup', updateTableContext);
+
+            // Phím Tab nhảy giữa các ô trong bảng giống Word
+            editor.addEventListener('keydown', (e) => {
+                if (e.key === 'Tab' && activeTableCell) {
+                    e.preventDefault();
+                    const table = activeTableCell.closest('table');
+                    if (!table) return;
+                    const allCells = Array.from(table.querySelectorAll('th, td'));
+                    const idx = allCells.indexOf(activeTableCell);
+                    const nextIdx = e.shiftKey ? idx - 1 : idx + 1;
+                    if (allCells[nextIdx]) {
+                        allCells[nextIdx].focus();
+                        const range = document.createRange();
+                        range.selectNodeContents(allCells[nextIdx]);
+                        const sel = window.getSelection();
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+                        activeTableCell = allCells[nextIdx];
+                    }
+                }
+            });
+        }
+
+        // ==================== ĐIỀU KHIỂN POPOVER, MODAL & MOBILE SIDEBAR ====================
+        function toggleMenuPopover(popoverId, event) {
+            if (event) event.stopPropagation();
+            const target = document.getElementById(popoverId);
+            if (!target) return;
+            const isCurrentlyVisible = target.classList.contains('popover-visible');
+            closeAllPopovers();
+            if (!isCurrentlyVisible) {
+                target.classList.remove('popover-hidden');
+                target.classList.add('popover-visible');
+            }
+        }
+
+        function closeAllPopovers() {
+            document.querySelectorAll('.popover-menu').forEach(menu => {
+                menu.classList.remove('popover-visible');
+                menu.classList.add('popover-hidden');
+            });
+        }
+
+        function toggleMobileSidebar(show) {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('mobile-sidebar-backdrop');
+            if (show) {
+                sidebar.classList.remove('-translate-x-full');
+                backdrop.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.add('hidden');
+            }
+        }
+
+        function openConfirmModal(onConfirm) {
+            const modal = document.getElementById('confirm-modal');
+            const confirmBtn = document.getElementById('confirm-delete-btn');
+            confirmBtn.onclick = () => {
+                onConfirm();
+                closeConfirmModal();
+            };
+            modal.classList.add('modal-open');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirm-modal')?.classList.remove('modal-open');
+        }
+
+        // ==================== HÀM TIỆN ÍCH ====================
+        function stripHtml(html) {
+            const tmp = document.createElement('div');
+            tmp.innerHTML = html;
+            return tmp.textContent || tmp.innerText || '';
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function formatRelativeTime(timestamp) {
+            const diffSec = Math.floor((Date.now() - timestamp) / 1000);
+            if (diffSec < 60) return 'Vừa xong';
+            const diffMin = Math.floor(diffSec / 60);
+            if (diffMin < 60) return `${diffMin} phút trước`;
+            const diffHour = Math.floor(diffMin / 60);
+            if (diffHour < 24) return `${diffHour} giờ trước`;
+            const diffDay = Math.floor(diffHour / 24);
+            if (diffDay < 7) return `${diffDay} ngày trước`;
+            return new Date(timestamp).toLocaleDateString('vi-VN');
+        }
+
+        // Gắn các hàm vào window để hoạt động mượt mà với onclick trong HTML khi dùng type="module"
+        Object.assign(window, {
+            setFilter,
+            handleSearch,
+            clearSearch,
+            createNewNote,
+            selectNote,
+            handleEditorInput,
+            updateNoteLabel,
+            togglePinCurrentNote,
+            deleteCurrentNote,
+            restoreCurrentNote,
+            toggleTheme,
+            toggleNoteListCollapse,
+            toggleMobileSidebar,
+            toggleMenuPopover,
+            openLabelManagerModal,
+            closeLabelManagerModal,
+            handleCancelLabelModal,
+            selectLabelIconChoice,
+            saveCustomLabel,
+            editCustomLabel,
+            deleteCustomLabel,
+            selectNoteFont,
+            selectNoteBgImage,
+            applyCustomBgImageUrl,
+            clearNoteBgImage,
+            updateNoteBgImageOpacity,
+            selectNoteBgColor,
+            selectNoteBgPattern,
+            execFormat,
+            toggleHeading,
+            insertTodoItem,
+            highlightTableGrid,
+            insertWordTable,
+            tableAction,
+            closeConfirmModal,
+            openCloudSettingsModal,
+            closeCloudSettingsModal,
+            copyWorkspaceId,
+            applyWorkspaceId,
+            saveCustomCloudConfig
         });
 
-        signInAnonymously(auth).catch((err) => {
-          console.error(err);
-          setCloudStatus('error', 'Lỗi kết nối');
-        });
-      } catch (err) {
-        console.error(err);
-        setCloudStatus('error', 'Lỗi kết nối');
-      }
-    }
-
-    function formatTime(ts) {
-      if (!ts) return '';
-      const d = new Date(ts);
-      return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' ' + d.toLocaleDateString('vi-VN');
-    }
-
-    function escapeHtml(str) {
-      return String(str).replace(/[&<>"']/g, s => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-      }[s]));
-    }
-
-    document.getElementById('workspace-input').value = state.workspaceId;
-    renderNoteList();
-    initFirebase();
-  </script>
+        window.onload = initApp;
+    </script>
 </body>
 </html>
