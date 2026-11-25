@@ -51,17 +51,33 @@
 
         /* ==================== KHUNG CỬA SỔ MACOS & GLASS VIBRANCY ==================== */
         .macos-wallpaper {
-            background: radial-gradient(circle at 15% 15%, #e0e7ff 0%, #f1f5f9 45%, #e2e8f0 100%);
+            background:
+                radial-gradient(1200px 700px at 0% 0%, rgba(199, 210, 254, 0.35), transparent 60%),
+                radial-gradient(1000px 600px at 100% 100%, rgba(204, 251, 241, 0.30), transparent 60%),
+                #eef0f4;
         }
         html.dark .macos-wallpaper {
-            background: radial-gradient(circle at 20% 10%, #1e1b4b 0%, #09090b 55%, #000000 100%);
+            background:
+                radial-gradient(1200px 700px at 0% 0%, rgba(49, 46, 129, 0.25), transparent 60%),
+                radial-gradient(1000px 600px at 100% 100%, rgba(19, 78, 74, 0.18), transparent 60%),
+                #0b0b0e;
         }
 
         .macos-window-frame {
-            box-shadow: 0 24px 68px -12px rgba(0, 0, 0, 0.18), inset 0 1px 0 0 rgba(255, 255, 255, 0.85);
+            border-radius: 14px;
+            border: 1px solid rgba(15, 23, 42, 0.06);
+            box-shadow:
+                0 1px 2px rgba(15, 23, 42, 0.04),
+                0 8px 28px -10px rgba(15, 23, 42, 0.10);
         }
         html.dark .macos-window-frame {
-            box-shadow: 0 30px 80px -12px rgba(0, 0, 0, 0.75), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.06);
+            box-shadow:
+                0 1px 2px rgba(0, 0, 0, 0.3),
+                0 12px 36px -12px rgba(0, 0, 0, 0.55);
+        }
+        @media (max-width: 767px) {
+            .macos-window-frame { border-radius: 0; border: none; box-shadow: none; }
         }
 
         .macos-sidebar-vibrancy {
@@ -401,7 +417,10 @@
             border: 1px solid rgba(255, 255, 255, 0.65);
             box-shadow: 0 12px 36px -8px rgba(15, 23, 42, 0.08);
             border-radius: 20px;
-            padding: 28px 32px;
+            padding: 32px 40px;
+        }
+        @media (max-width: 640px) {
+            .has-bg-image .reading-glass-card { padding: 22px 20px; }
         }
         html.dark .has-bg-image .reading-glass-card {
             background: rgba(18, 20, 26, 0.78);
@@ -419,10 +438,12 @@
             user-select: text;
             outline: none;
             line-height: 1.75;
-            min-height: 360px;
+            min-height: 240px;
+            cursor: text;
         }
 
-        #editor-content:empty:before {
+        #editor-content:empty:before,
+        #editor-content:has(> br:only-child):before {
             content: attr(data-placeholder);
             color: #9ca3af;
             pointer-events: none;
@@ -430,6 +451,44 @@
         }
         html.dark #editor-content:empty:before {
             color: #52525b;
+        }
+
+        /* Lưới an toàn: vô hiệu màu chữ / nền / font inline từ nội dung đã dán trước đây */
+        #editor-content :is(p, span, font, div, h1, h2, h3, h4, h5, h6, li, ul, ol, strong, b, em, i, u, a, blockquote, section, article, label) {
+            color: inherit !important;
+            background-color: transparent !important;
+            font-family: inherit !important;
+        }
+        #editor-content :is(span, font, p, div, li) { font-size: inherit !important; }
+        #editor-content :is(p, span, font, h1, h2, h3, h4, h5, h6, section, article) {
+            margin-left: 0 !important;
+            padding-left: 0 !important;
+            text-indent: 0 !important;
+        }
+        #editor-content p { margin: 0.5rem 0; }
+        #editor-content h3 {
+            font-size: 1.15rem;
+            font-weight: 650;
+            margin-top: 1rem;
+            margin-bottom: 0.4rem;
+            line-height: 1.35;
+        }
+        #editor-content ol {
+            list-style-type: decimal;
+            padding-left: 1.5rem;
+            margin: 0.65rem 0;
+        }
+        #editor-content a {
+            color: #4f46e5 !important;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+        html.dark #editor-content a { color: #a5b4fc !important; }
+        #editor-content blockquote {
+            border-left: 3px solid rgba(99, 102, 241, 0.4);
+            padding-left: 0.9rem;
+            margin: 0.75rem 0;
+            opacity: 0.9;
         }
 
         #editor-content h2 {
@@ -515,10 +574,10 @@
         }
     </style>
 </head>
-<body class="macos-wallpaper text-gray-800 dark:text-zinc-100 h-screen w-screen flex items-center justify-center md:p-3 lg:p-4 overflow-hidden">
+<body class="macos-wallpaper text-gray-800 dark:text-zinc-100 h-screen w-screen flex overflow-hidden md:p-2 lg:p-2.5">
 
     <!-- ==================== KHUNG CỬA SỔ ỨNG DỤNG MACOS ==================== -->
-    <div id="app-window" class="macos-window-frame w-full h-full md:rounded-2xl overflow-hidden flex bg-white/95 dark:bg-zinc-950/95 border border-gray-200/80 dark:border-zinc-800/90 relative">
+    <div id="app-window" class="macos-window-frame w-full h-full overflow-hidden flex bg-white dark:bg-zinc-950 relative">
 
         <!-- Lớp phủ nền tối trên thiết bị di động khi mở Sidebar -->
         <div id="mobile-sidebar-backdrop" onclick="toggleMobileSidebar(false)" class="fixed inset-0 bg-black/40 backdrop-blur-xs z-30 hidden md:hidden transition-opacity"></div>
@@ -841,8 +900,8 @@
                 </div>
 
                 <!-- Khu vực viết nội dung chính -->
-                <div id="editor-scroll-area" class="flex-1 overflow-y-auto px-5 sm:px-10 md:px-14 py-7">
-                    <div id="reading-surface" class="reading-glass-card max-w-3xl mx-auto transition-all duration-300">
+                <div id="editor-scroll-area" class="flex-1 flex flex-col overflow-y-auto px-5 sm:px-8 md:px-12 py-6 md:py-8">
+                    <div id="reading-surface" class="reading-glass-card w-full max-w-4xl mx-auto flex-1 flex flex-col transition-all duration-300">
                         <!-- Thông tin thời gian & bộ đếm từ -->
                         <div class="flex flex-wrap items-center gap-2 text-xs text-gray-400 dark:text-zinc-500 mb-3">
                             <span class="inline-flex items-center gap-1">
@@ -854,10 +913,10 @@
                         </div>
 
                         <!-- Ô nhập tiêu đề ghi chú -->
-                        <input id="note-title-input" type="text" oninput="handleEditorInput()" placeholder="Tiêu đề ghi chú..." class="w-full bg-transparent text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 dark:text-white placeholder-gray-300 dark:placeholder-zinc-700 focus:outline-none mb-4">
+                        <input id="note-title-input" type="text" spellcheck="false" autocomplete="off" oninput="handleEditorInput()" placeholder="Tiêu đề ghi chú..." class="w-full bg-transparent text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 dark:text-white placeholder-gray-300 dark:placeholder-zinc-700 focus:outline-none pb-4 mb-5 border-b border-gray-200/70 dark:border-zinc-700/60">
 
                         <!-- Vùng soạn thảo Rich Text -->
-                        <div id="editor-content" contenteditable="true" data-placeholder="Bắt đầu viết nội dung, ý tưởng hoặc danh sách công việc tại đây..." class="text-base text-gray-700 dark:text-zinc-200"></div>
+                        <div id="editor-content" contenteditable="true" spellcheck="false" autocorrect="off" autocapitalize="off" data-placeholder="Bắt đầu viết nội dung, ý tưởng hoặc danh sách công việc tại đây..." class="flex-1 text-base text-gray-700 dark:text-zinc-200"></div>
                     </div>
                 </div>
             </div>
@@ -1726,11 +1785,20 @@
             popFilterKey = null;
         }
 
+        let lastNoteListSignature = '';
+        let lastFolderTitle = '';
+
         function renderNoteList() {
             const filtered = getFilteredNotes();
             const container = document.getElementById('notes-container');
             const titleEl = document.getElementById('current-folder-title');
             const subtitleEl = document.getElementById('current-folder-subtitle');
+
+            // Chỉ chạy hiệu ứng khi đổi thư mục hoặc danh sách ghi chú thay đổi (thêm/xóa/sắp xếp),
+            // không chạy lại khi chỉ đang gõ nội dung để tránh nhấp nháy.
+            const signature = currentFilter + '|' + filtered.map(n => n.id).join(',');
+            const shouldAnimate = signature !== lastNoteListSignature;
+            lastNoteListSignature = signature;
 
             let folderName = 'Tất cả ghi chú';
             if (currentFilter === 'pinned') folderName = 'Đã ghim';
@@ -1739,7 +1807,8 @@
                 folderName = getLabelInfo(currentFilter).name;
             }
 
-            if (titleEl) {
+            if (titleEl && folderName !== lastFolderTitle) {
+                lastFolderTitle = folderName;
                 titleEl.textContent = folderName;
                 titleEl.classList.remove('title-slide-in');
                 void titleEl.offsetWidth;
@@ -1769,7 +1838,7 @@
                 const delay = Math.min(idx * 32, 260);
 
                 return `
-                    <div onclick="selectNote('${note.id}')" style="animation-delay: ${delay}ms" class="note-card-enter p-3 rounded-xl cursor-pointer transition-all border ${
+                    <div onclick="selectNote('${note.id}')" ${shouldAnimate ? `style="animation-delay: ${delay}ms"` : ''} class="${shouldAnimate ? 'note-card-enter ' : ''}p-3 rounded-xl cursor-pointer transition-all border ${
                         isSelected
                             ? 'bg-white dark:bg-zinc-800/95 border-indigo-500/50 shadow-sm ring-1 ring-indigo-500/20'
                             : 'bg-white/60 dark:bg-zinc-900/40 border-transparent hover:bg-white dark:hover:bg-zinc-800/70 hover:border-gray-200/70 dark:hover:border-zinc-700/70'
@@ -1896,7 +1965,9 @@
             if (!note || note.trashed) return;
 
             note.title = document.getElementById('note-title-input').value;
-            note.content = document.getElementById('editor-content').innerHTML;
+            const editorEl = document.getElementById('editor-content');
+            if (editorEl.innerHTML === '<br>' || editorEl.innerHTML === '<div><br></div>') editorEl.innerHTML = '';
+            note.content = editorEl.innerHTML;
             note.updatedAt = Date.now();
 
             updateEditorMetadata(note);
@@ -2537,10 +2608,88 @@
             handleEditorInput();
         }
 
+        function plainTextToHtml(text) {
+            if (!text) return '';
+            const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return text.replace(/\r\n?/g, '\n').split(/\n{2,}/)
+                .map(p => `<p>${esc(p).replace(/\n/g, '<br>')}</p>`).join('');
+        }
+
+        function sanitizePastedHtml(html) {
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            const TAG_MAP = { H1: 'h2', H2: 'h2', H3: 'h3', H4: 'h3', H5: 'h3', H6: 'h3', B: 'strong', I: 'em' };
+            const KEEP = new Set(['P', 'BR', 'STRONG', 'EM', 'U', 'S', 'UL', 'OL', 'LI', 'A', 'BLOCKQUOTE',
+                'PRE', 'CODE', 'TABLE', 'THEAD', 'TBODY', 'TR', 'TD', 'TH', 'HR', 'IMG', 'DIV', 'H2', 'H3']);
+            const DROP = new Set(['SCRIPT', 'STYLE', 'META', 'LINK', 'TITLE', 'IFRAME', 'OBJECT', 'EMBED', 'NOSCRIPT', 'svg', 'SVG']);
+
+            const walk = (node, out) => {
+                node.childNodes.forEach(child => {
+                    if (child.nodeType === 3) { out.appendChild(document.createTextNode(child.textContent)); return; }
+                    if (child.nodeType !== 1) return;
+                    const tag = child.tagName.toUpperCase();
+                    if (DROP.has(tag)) return;
+
+                    // Giữ lại in đậm/nghiêng/gạch chân nếu nguồn dùng style inline trên span
+                    const st = child.style || {};
+                    let target = TAG_MAP[tag] || (KEEP.has(tag) ? tag.toLowerCase() : null);
+
+                    if (!target) { // span, font, section... -> bỏ thẻ, giữ nội dung
+                        let wrap = out;
+                        const fw = st.fontWeight;
+                        if (fw === 'bold' || parseInt(fw) >= 600) { const s = document.createElement('strong'); wrap.appendChild(s); wrap = s; }
+                        if (st.fontStyle === 'italic') { const s = document.createElement('em'); wrap.appendChild(s); wrap = s; }
+                        if ((st.textDecoration || '').includes('underline')) { const s = document.createElement('u'); wrap.appendChild(s); wrap = s; }
+                        walk(child, wrap);
+                        return;
+                    }
+
+                    const el = document.createElement(target);
+                    if (target === 'a' && child.getAttribute('href') && !/^\s*javascript:/i.test(child.getAttribute('href'))) {
+                        el.setAttribute('href', child.getAttribute('href'));
+                        el.setAttribute('target', '_blank');
+                        el.setAttribute('rel', 'noopener');
+                    }
+                    if (target === 'img') {
+                        const src = child.getAttribute('src') || '';
+                        if (!/^(https?:|data:image\/)/i.test(src)) return;
+                        el.setAttribute('src', src);
+                        el.setAttribute('style', 'max-width:100%;height:auto;border-radius:8px;');
+                    }
+                    if ((target === 'td' || target === 'th')) {
+                        ['colspan', 'rowspan'].forEach(a => child.getAttribute(a) && el.setAttribute(a, child.getAttribute(a)));
+                    }
+                    walk(child, el);
+                    out.appendChild(el);
+                });
+            };
+
+            const container = document.createElement('div');
+            walk(doc.body, container);
+            // Bỏ các đoạn rỗng thừa ở đầu/cuối
+            container.querySelectorAll('p, div').forEach(p => {
+                if (!p.textContent.trim() && !p.querySelector('img, br, table')) p.remove();
+            });
+            return container.innerHTML;
+        }
+
         function setupEditorEventListeners() {
             const editor = document.getElementById('editor-content');
 
             editor.addEventListener('input', handleEditorInput);
+
+            // Làm sạch nội dung khi dán từ nguồn khác (bỏ màu chữ, nền, font, cỡ chữ... gây mờ/khó đọc)
+            editor.addEventListener('paste', (e) => {
+                const cd = e.clipboardData || window.clipboardData;
+                if (!cd) return;
+                // Cho phép dán ảnh/tệp theo mặc định
+                if (cd.files && cd.files.length > 0 && !cd.getData('text/plain')) return;
+                e.preventDefault();
+                const html = cd.getData('text/html');
+                const text = cd.getData('text/plain');
+                const clean = html ? sanitizePastedHtml(html) : plainTextToHtml(text);
+                document.execCommand('insertHTML', false, clean);
+                handleEditorInput();
+            });
 
             // Xử lý tick chọn Checkbox Todo trực tiếp
             editor.addEventListener('change', (e) => {
